@@ -1,0 +1,37 @@
+.main-app {
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.main-app__header {
+  text-align: center;
+}
+
+.main-app__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.main-app__nav {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+.main-app__nav a {
+  color: #555;
+  text-decoration: none;
+}
+
+.main-app__nav a:hover {
+  color: #1a1a1a;
+  text-decoration: underline;
+}
