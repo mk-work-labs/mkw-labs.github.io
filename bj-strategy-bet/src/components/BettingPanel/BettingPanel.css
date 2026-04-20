@@ -107,3 +107,25 @@
   padding-top: 0.5rem;
   border-top: 1px solid #e5e5e5;
 }
+
+.betting-panel__footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.betting-panel__reset {
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid #d4d4d4;
+  background: transparent;
+  color: #666;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.betting-panel__reset:hover {
+  background: #f3f4f6;
+  color: #333;
+  border-color: #bbb;
+}

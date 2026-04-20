@@ -54,7 +54,7 @@ export default function BettingPanel() {
   }
   const method = methodRef.current;
 
-  const [startedAt] = useState(initialSession.startedAt);
+  const [startedAt, setStartedAt] = useState(initialSession.startedAt);
   const [fund, setFund] = useState(initialSession.currentFund);
   const [hands, setHands] = useState(initialSession.hands ?? []);
   const [methodState, setMethodState] = useState(() => method.getState());
@@ -109,6 +109,20 @@ export default function BettingPanel() {
         timestamp: new Date().toISOString(),
       },
     ]);
+  };
+
+  const handleReset = () => {
+    if (hands.length > 0) {
+      const ok = window.confirm(
+        '現在のセッションをリセットしますか？\n資金・履歴・連勝数がすべて初期化されます。'
+      );
+      if (!ok) return;
+    }
+    method.reset();
+    setMethodState(method.getState());
+    setFund(settings.initialFund);
+    setHands([]);
+    setStartedAt(new Date().toISOString());
   };
 
   return (
@@ -182,6 +196,16 @@ export default function BettingPanel() {
             : `${Math.round(stats.winRate * 100)}%`}
         </span>
         <span>連勝 {methodState.consecutiveWins}</span>
+      </div>
+
+      <div className="betting-panel__footer">
+        <button
+          type="button"
+          className="betting-panel__reset"
+          onClick={handleReset}
+        >
+          セッションをリセット
+        </button>
       </div>
     </section>
   );
