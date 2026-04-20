@@ -583,10 +583,17 @@ GitHub Pages は静的サイトのみのため、**ブラウザの localStorage 
 `vite.config.js` で base パスを設定：
 ```js
 export default defineConfig({
-  base: '/bj-strategy-bet/',  // リポジトリ名に合わせる
+  // リポジトリ名（mkw-labs.github.io）がオーナー名（mk-work-labs）と
+  // 一致しないため GitHub Pages は project site として扱われ、
+  // 公開 URL に /<repo>/ プレフィックスが付く
+  base: '/mkw-labs.github.io/bj-strategy-bet/',
   plugins: [react()],
 })
 ```
+
+公開 URL:
+- メニュー: `https://mk-work-labs.github.io/mkw-labs.github.io/`
+- BJ ツール: `https://mk-work-labs.github.io/mkw-labs.github.io/bj-strategy-bet/`
 
 #### 5.3.2 デプロイ方法
 **推奨：GitHub Actions による自動デプロイ**
