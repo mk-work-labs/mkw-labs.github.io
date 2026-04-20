@@ -26,12 +26,19 @@
   font-size: 0.95rem;
 }
 
-.main-app__nav a {
+.main-app__nav a,
+.main-app__nav-btn {
   color: #555;
   text-decoration: none;
+  font: inherit;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
-.main-app__nav a:hover {
+.main-app__nav a:hover,
+.main-app__nav-btn:hover {
   color: #1a1a1a;
   text-decoration: underline;
 }

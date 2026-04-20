@@ -1,0 +1,39 @@
+.settings-app {
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.settings-app__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.settings-app__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.settings-app__back {
+  color: #555;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.settings-app__back:hover {
+  color: #1a1a1a;
+  text-decoration: underline;
+}
+
+.settings-app__card {
+  padding: 1rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 0.75rem;
+  background: #fafafa;
+}
