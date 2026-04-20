@@ -23,7 +23,14 @@ export function judgeAction(playerCards, dealerCard) {
 
   const row = table[key];
   if (!row) return null;
-  return row[dealerCard] ?? null;
+  const raw = row[dealerCard] ?? null;
+
+  // 3枚以上はダブル不可（仕様書 §4.2.6）。D → H, Ds → S にフォールバック
+  if (Array.isArray(playerCards) && playerCards.length > 2) {
+    if (raw === 'D') return 'H';
+    if (raw === 'Ds') return 'S';
+  }
+  return raw;
 }
 
 export { HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY };

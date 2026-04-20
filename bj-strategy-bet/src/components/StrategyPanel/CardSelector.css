@@ -46,8 +46,36 @@
   color: transparent;
 }
 
+.card-slot--hit {
+  border-color: #cbd5e1;
+  background: #f5f7fa;
+}
+
 .card-slot:hover {
   border-color: #2563eb;
+}
+
+.card-selector__add {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.5rem;
+  border: 2px dashed #bbb;
+  background: #fff;
+  color: #555;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.card-selector__add:hover:not(:disabled) {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.card-selector__add:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .card-selector__clear {

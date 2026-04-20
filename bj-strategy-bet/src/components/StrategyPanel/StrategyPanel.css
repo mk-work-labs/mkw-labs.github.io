@@ -44,3 +44,14 @@
 .strategy-panel__action--stand  { color: #dc2626; }
 .strategy-panel__action--double { color: #16a34a; }
 .strategy-panel__action--split  { color: #ea580c; }
+
+.strategy-panel__hand {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  font-variant-numeric: tabular-nums;
+}
+
+.strategy-panel__hand--bust {
+  color: #dc2626;
+}
