@@ -743,7 +743,7 @@ bj-strategy-bet/
 - [ ] 収支グラフ
 - [ ] セッション履歴画面（+ リセット時の履歴アーカイブ）
 - [ ] CSV エクスポート
-- [ ] **ストラテジー表の編集機能**（設定画面から編集可能）
+- [x] **ストラテジー表の編集機能**（設定画面から編集可能、`src/components/StrategyEditor/`、保存は `src/storage/strategy-storage.js`）
 - [ ] UI/UX のブラッシュアップ（モバイル最適化）
 
 **Phase 2 前段として実装済み**

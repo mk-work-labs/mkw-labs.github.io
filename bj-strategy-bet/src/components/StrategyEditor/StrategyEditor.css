@@ -1,0 +1,232 @@
+.strategy-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.strategy-editor__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.strategy-editor__back {
+  border: 1px solid #ccc;
+  background: #ffffff;
+  color: #444;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.625rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.strategy-editor__back:hover {
+  background: #f3f4f6;
+}
+
+.strategy-editor__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.strategy-editor__tabs {
+  display: flex;
+  gap: 0.375rem;
+  padding: 0.25rem;
+  background: #f2f2f2;
+  border-radius: 0.5rem;
+}
+
+.strategy-editor__tab {
+  flex: 1 1 auto;
+  border: none;
+  background: transparent;
+  color: #555;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 2.25rem;
+}
+
+.strategy-editor__tab--active {
+  background: #ffffff;
+  color: #1a1a1a;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.strategy-editor__table-wrap {
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.strategy-editor__table {
+  border-collapse: separate;
+  border-spacing: 2px;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+.strategy-editor__corner,
+.strategy-editor__col-head,
+.strategy-editor__row-head {
+  background: #f5f5f5;
+  color: #555;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 0.375rem 0;
+  border-radius: 0.25rem;
+}
+
+.strategy-editor__row-head {
+  min-width: 2.25rem;
+  padding: 0.375rem 0.375rem;
+}
+
+.strategy-editor__col-head {
+  min-width: 1.75rem;
+}
+
+.strategy-editor__corner-text {
+  font-size: 0.625rem;
+  color: #888;
+  white-space: nowrap;
+}
+
+.strategy-editor__cell-wrap {
+  position: relative;
+  padding: 0;
+}
+
+.strategy-editor__cell {
+  width: 100%;
+  min-width: 1.75rem;
+  min-height: 2rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  background: #ffffff;
+  color: #333;
+  line-height: 1;
+  padding: 0.25rem 0;
+}
+
+.strategy-editor__cell:hover {
+  filter: brightness(0.96);
+}
+
+.strategy-editor__cell--active {
+  outline: 2px solid #1a1a1a;
+  outline-offset: 1px;
+  z-index: 1;
+}
+
+.strategy-editor__cell--hit {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.strategy-editor__cell--stand {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.strategy-editor__cell--double {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.strategy-editor__cell--split {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.strategy-editor__popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.375rem;
+  background: #ffffff;
+  border: 1px solid #d4d4d4;
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.strategy-editor__popover-item {
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  background: #ffffff;
+  color: #333;
+}
+
+.strategy-editor__popover-item--hit    { background: #dbeafe; color: #1d4ed8; }
+.strategy-editor__popover-item--stand  { background: #fee2e2; color: #b91c1c; }
+.strategy-editor__popover-item--double { background: #dcfce7; color: #15803d; }
+.strategy-editor__popover-item--split  { background: #ffedd5; color: #c2410c; }
+
+.strategy-editor__popover-item--current {
+  outline: 2px solid #1a1a1a;
+  outline-offset: 1px;
+}
+
+.strategy-editor__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  font-size: 0.7rem;
+}
+
+.strategy-editor__legend-item {
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+}
+
+.strategy-editor__legend-item--hit    { background: #dbeafe; color: #1d4ed8; }
+.strategy-editor__legend-item--stand  { background: #fee2e2; color: #b91c1c; }
+.strategy-editor__legend-item--double { background: #dcfce7; color: #15803d; }
+.strategy-editor__legend-item--split  { background: #ffedd5; color: #c2410c; }
+
+.strategy-editor__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.strategy-editor__reset {
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.375rem;
+  border: 1px solid #ccc;
+  background: #ffffff;
+  color: #444;
+  font-size: 0.85rem;
+  cursor: pointer;
+  min-height: 2.5rem;
+}
+
+.strategy-editor__reset:hover {
+  background: #f3f4f6;
+}
+
+.strategy-editor__reset--danger {
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.strategy-editor__reset--danger:hover {
+  background: #fef2f2;
+}
