@@ -1,0 +1,68 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: bj-strategy-bet/package-lock.json
+
+      - name: Install bj-strategy-bet dependencies
+        working-directory: bj-strategy-bet
+        run: npm ci
+
+      - name: Build bj-strategy-bet
+        working-directory: bj-strategy-bet
+        run: npm run build
+
+      - name: Assemble site
+        run: |
+          set -eux
+          mkdir -p _site
+          # Copy root static assets (menu page)
+          cp index.html _site/
+          cp -r css _site/
+          cp -r js _site/
+          cp -r images _site/
+          # Copy bj-strategy-bet build output
+          mkdir -p _site/bj-strategy-bet
+          cp -r bj-strategy-bet/dist/. _site/bj-strategy-bet/
+          # Disable Jekyll processing as a safety net
+          touch _site/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
