@@ -18,7 +18,7 @@
 
 .strategy-panel__result-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.75rem;
   font-size: 1rem;
 }
@@ -32,3 +32,15 @@
 .strategy-panel__result-placeholder {
   color: #aaa;
 }
+
+.strategy-panel__action {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
+.strategy-panel__action--hit    { color: #2563eb; }
+.strategy-panel__action--stand  { color: #dc2626; }
+.strategy-panel__action--double { color: #16a34a; }
+.strategy-panel__action--split  { color: #ea580c; }

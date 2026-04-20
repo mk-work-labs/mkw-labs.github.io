@@ -1,7 +1,16 @@
 import { useState } from 'react';
 import CardSelector from './CardSelector.jsx';
 import RankPicker from './RankPicker.jsx';
+import { judgeAction } from '../../logic/strategy/index.js';
 import './StrategyPanel.css';
+
+const ACTION_LABELS = {
+  H:  { text: 'ヒット',       variant: 'hit' },
+  S:  { text: 'スタンド',     variant: 'stand' },
+  D:  { text: 'ダブルダウン', variant: 'double' },
+  Ds: { text: 'ダブルダウン', variant: 'double' },
+  P:  { text: 'スプリット',   variant: 'split' },
+};
 
 function nextEmptySlot(playerCards, dealerCard) {
   if (playerCards[0] === null) return 'player-0';
@@ -36,6 +45,9 @@ export default function StrategyPanel() {
 
   const handleClose = () => setPickerSlot(null);
 
+  const action = judgeAction(playerCards, dealerCard);
+  const actionLabel = action ? ACTION_LABELS[action] : null;
+
   return (
     <section className="strategy-panel">
       <CardSelector
@@ -45,14 +57,22 @@ export default function StrategyPanel() {
         onClear={handleClear}
       />
       <div className="strategy-panel__result">
-        <p className="strategy-panel__result-row">
+        <div className="strategy-panel__result-row">
           <span className="strategy-panel__result-label">推奨</span>
-          <span className="strategy-panel__result-placeholder">—</span>
-        </p>
-        <p className="strategy-panel__result-row">
+          {actionLabel ? (
+            <span
+              className={`strategy-panel__action strategy-panel__action--${actionLabel.variant}`}
+            >
+              {actionLabel.text}
+            </span>
+          ) : (
+            <span className="strategy-panel__result-placeholder">—</span>
+          )}
+        </div>
+        <div className="strategy-panel__result-row">
           <span className="strategy-panel__result-label">勝率</span>
           <span className="strategy-panel__result-placeholder">—</span>
-        </p>
+        </div>
       </div>
       <RankPicker
         slot={pickerSlot}
