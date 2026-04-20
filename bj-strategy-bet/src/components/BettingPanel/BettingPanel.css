@@ -1,0 +1,109 @@
+.betting-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 0.75rem;
+  background: #fafafa;
+}
+
+.betting-panel__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.betting-panel__summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.betting-panel__summary-label {
+  color: #666;
+}
+
+.betting-panel__summary-value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.betting-panel__summary-value--positive {
+  color: #16a34a;
+}
+
+.betting-panel__summary-value--negative {
+  color: #dc2626;
+}
+
+.betting-panel__next-bet {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+}
+
+.betting-panel__next-bet-label {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.betting-panel__next-bet-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #1a1a1a;
+}
+
+.betting-panel__next-bet-unit {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.betting-panel__actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.betting-panel__action {
+  min-height: 3rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.05s ease;
+}
+
+.betting-panel__action:hover {
+  filter: brightness(1.05);
+}
+
+.betting-panel__action:active {
+  transform: translateY(1px);
+}
+
+.betting-panel__action--win  { background: #16a34a; }
+.betting-panel__action--loss { background: #dc2626; }
+.betting-panel__action--push { background: #6b7280; }
+.betting-panel__action--bj   { background: #2563eb; }
+
+.betting-panel__stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #555;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e5e5e5;
+}
