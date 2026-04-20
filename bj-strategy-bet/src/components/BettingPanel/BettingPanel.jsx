@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { BarnettMethod } from '../../logic/betting/barnett.js';
+import {
+  createMethod,
+  getMethodLabel,
+  resolveMethodId,
+} from '../../logic/betting/registry.js';
 import { loadSettings } from '../../storage/settings-storage.js';
 import {
   loadSession,
@@ -19,37 +23,56 @@ function fundDelta(result, bet) {
   return 0;
 }
 
-function buildInitialSession(settings) {
+function buildInitialSession(settings, methodId) {
   return {
     startedAt: new Date().toISOString(),
     initialFund: settings.initialFund,
     baseBet: settings.baseBet,
     currentFund: settings.initialFund,
-    currentMethod: 'barnett',
-    methodState: { barnett: { consecutiveWins: 0 } },
+    currentMethod: methodId,
+    methodState: {},
     hands: [],
     methodSwitches: [],
   };
 }
 
+// メソッド固有の状態表記（バーネット/グッドマンは「連勝 N」、モンテカルロは数列）
+function describeMethodState(methodState) {
+  if (!methodState) return null;
+  if (methodState.name === 'montecarlo') {
+    return `数列 [${methodState.sequence.join(', ')}]`;
+  }
+  return `連勝 ${methodState.consecutiveWins ?? 0}`;
+}
+
 export default function BettingPanel() {
-  // 起動時に設定とセッションを読み込む（一度のみ）
+  // 起動時に設定とセッションを解決。settings のメソッドと session の
+  // currentMethod が異なる場合、method を切替えた扱い（新規初期化）
   const bootstrapRef = useRef(null);
   if (bootstrapRef.current === null) {
     const settings = loadSettings();
+    const activeMethodId = resolveMethodId(settings.bettingMethod);
     const stored = loadSession();
+    const session = stored ?? buildInitialSession(settings, activeMethodId);
+    const switched = session.currentMethod !== activeMethodId;
     bootstrapRef.current = {
       settings,
-      session: stored ?? buildInitialSession(settings),
+      activeMethodId,
+      session,
+      switched,
     };
   }
-  const { settings, session: initialSession } = bootstrapRef.current;
+  const { settings, activeMethodId, session: initialSession, switched } =
+    bootstrapRef.current;
 
-  // BarnettMethod のインスタンスはライフタイム中保持。保存状態があれば復元
+  // method インスタンスは切替え時に作り直される構造にしたいので
+  // activeMethodId 固定の前提でライフタイム中 1 つだけ保持
   const methodRef = useRef(null);
   if (methodRef.current === null) {
-    const m = new BarnettMethod(initialSession.baseBet ?? settings.baseBet);
-    m.restore(initialSession.methodState?.barnett);
+    const m = createMethod(activeMethodId, settings.baseBet);
+    if (!switched) {
+      m.restore(initialSession.methodState?.[activeMethodId]);
+    }
     methodRef.current = m;
   }
   const method = methodRef.current;
@@ -59,21 +82,31 @@ export default function BettingPanel() {
   const [hands, setHands] = useState(initialSession.hands ?? []);
   const [methodState, setMethodState] = useState(() => method.getState());
 
-  // state 変化時にセッションを永続化
+  // 資金編集
+  const [editingFund, setEditingFund] = useState(false);
+  const [editValue, setEditValue] = useState('');
+
+  // state 変化時にセッションを永続化。methodState は current method の
+  // キーに入れ、他メソッドの履歴は保持する
   useEffect(() => {
+    const preservedMethodState = initialSession.methodState ?? {};
     saveSession({
       startedAt,
       initialFund: settings.initialFund,
       baseBet: settings.baseBet,
       currentFund: fund,
-      currentMethod: 'barnett',
+      currentMethod: activeMethodId,
       methodState: {
-        barnett: { consecutiveWins: methodState.consecutiveWins },
+        ...preservedMethodState,
+        [activeMethodId]: {
+          // getState() の中身をそのまま保存。restore 側で必要な値だけ見る
+          ...methodState,
+        },
       },
       hands,
-      methodSwitches: [],
+      methodSwitches: initialSession.methodSwitches ?? [],
     });
-  }, [startedAt, settings, fund, hands, methodState]);
+  }, [startedAt, settings, activeMethodId, fund, hands, methodState, initialSession]);
 
   const stats = useMemo(() => {
     const decided = hands.filter((h) => h.result !== 'push');
@@ -102,7 +135,7 @@ export default function BettingPanel() {
       ...prev,
       {
         id: prev.length + 1,
-        bettingMethod: 'barnett',
+        bettingMethod: activeMethodId,
         bet,
         result,
         fundAfter: nextFund,
@@ -125,12 +158,73 @@ export default function BettingPanel() {
     setStartedAt(new Date().toISOString());
   };
 
+  const startEditFund = () => {
+    setEditValue(String(fund));
+    setEditingFund(true);
+  };
+
+  const cancelEditFund = () => {
+    setEditingFund(false);
+    setEditValue('');
+  };
+
+  const commitEditFund = (event) => {
+    event.preventDefault();
+    const raw = editValue.replace(/[^\d-]/g, '');
+    const n = Number(raw);
+    if (!Number.isFinite(n)) {
+      cancelEditFund();
+      return;
+    }
+    setFund(Math.trunc(n));
+    cancelEditFund();
+  };
+
   return (
     <section className="betting-panel">
       <div className="betting-panel__summary">
         <div className="betting-panel__summary-row">
           <span className="betting-panel__summary-label">資金</span>
-          <span className="betting-panel__summary-value">{formatYen(fund)}</span>
+          {editingFund ? (
+            <form
+              className="betting-panel__fund-edit"
+              onSubmit={commitEditFund}
+            >
+              <input
+                className="betting-panel__fund-input"
+                type="number"
+                inputMode="numeric"
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                autoFocus
+              />
+              <button
+                type="submit"
+                className="betting-panel__fund-submit"
+              >
+                保存
+              </button>
+              <button
+                type="button"
+                className="betting-panel__fund-cancel"
+                onClick={cancelEditFund}
+              >
+                取消
+              </button>
+            </form>
+          ) : (
+            <span className="betting-panel__summary-value">
+              {formatYen(fund)}
+              <button
+                type="button"
+                className="betting-panel__fund-edit-btn"
+                onClick={startEditFund}
+                aria-label="資金を編集"
+              >
+                編集
+              </button>
+            </span>
+          )}
         </div>
         <div className="betting-panel__summary-row">
           <span className="betting-panel__summary-label">通算収支</span>
@@ -146,14 +240,25 @@ export default function BettingPanel() {
         </div>
       </div>
 
+      <div className="betting-panel__method">
+        <span className="betting-panel__method-label">
+          {getMethodLabel(activeMethodId)}
+        </span>
+        <span className="betting-panel__method-state">
+          {describeMethodState(methodState)}
+        </span>
+      </div>
+
       <div className="betting-panel__next-bet">
         <span className="betting-panel__next-bet-label">次回ベット</span>
         <span className="betting-panel__next-bet-value">
           {formatYen(methodState.nextBet)}
         </span>
-        <span className="betting-panel__next-bet-unit">
-          （{methodState.unit}u）
-        </span>
+        {typeof methodState.unit === 'number' && (
+          <span className="betting-panel__next-bet-unit">
+            （{methodState.unit}u）
+          </span>
+        )}
       </div>
 
       <div className="betting-panel__actions">
@@ -195,7 +300,6 @@ export default function BettingPanel() {
             ? '—'
             : `${Math.round(stats.winRate * 100)}%`}
         </span>
-        <span>連勝 {methodState.consecutiveWins}</span>
       </div>
 
       <div className="betting-panel__footer">
