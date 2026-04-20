@@ -1,0 +1,67 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  min-height: 100vh;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background-color: #ffffff;
+  color: #1a1a1a;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+    "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, Arial,
+    sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.menu {
+  text-align: center;
+}
+
+.menu__title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.menu__divider {
+  width: 4rem;
+  margin: 1.25rem auto 2rem;
+  border: none;
+  border-top: 1px solid #333;
+}
+
+.menu__nav ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.menu__nav a {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  color: #1a1a1a;
+  text-decoration: none;
+  font-size: 1.125rem;
+  letter-spacing: 0.04em;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.menu__nav a:hover,
+.menu__nav a:focus-visible {
+  color: #666;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
