@@ -733,10 +733,11 @@ bj-strategy-bet/
 - [x] 勝敗入力・次回ベット計算
 - [x] localStorage でのセッション保存
 - [x] リセット機能
-- [ ] GitHub Pages への初回デプロイ
+- [x] GitHub Pages への初回デプロイ
 
 **TODO外の改善**
 - [x] ヒット後の判定対応（プレイヤー手札を可変長化、3+ 枚時の D/Ds フォールバック、ハンド合計表示）
+- [x] デプロイ URL 修正（project site 前提に Vite の base を訂正）
 
 ### Phase 2: 機能拡充
 - [ ] 収支グラフ
