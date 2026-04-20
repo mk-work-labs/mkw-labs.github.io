@@ -15,7 +15,8 @@ function parsePositiveInt(value, fallback) {
 
 // ページ版とオーバーレイ版で共用するフォーム本体。
 // onSaved は保存完了時に呼ばれる（親側で再読み込みや閉じる判断に使う）
-export default function SettingsForm({ onSaved }) {
+// onEditStrategy があればストラテジー表編集への導線ボタンを表示する（オーバーレイ用）
+export default function SettingsForm({ onSaved, onEditStrategy }) {
   const [form, setForm] = useState(() => loadSettings());
   const [savedAt, setSavedAt] = useState(null);
 
@@ -98,6 +99,16 @@ export default function SettingsForm({ onSaved }) {
           切替え時は新しいメソッドを初期状態から開始し、資金は引き継がれます
         </p>
       </label>
+
+      {onEditStrategy && (
+        <button
+          type="button"
+          className="settings-form__link"
+          onClick={onEditStrategy}
+        >
+          ストラテジー表を編集 →
+        </button>
+      )}
 
       <div className="settings-form__actions">
         <button type="submit" className="settings-form__save">

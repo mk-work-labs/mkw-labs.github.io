@@ -1,4 +1,5 @@
 import SettingsForm from '../components/Settings/SettingsForm.jsx';
+import StrategyEditor from '../components/StrategyEditor/StrategyEditor.jsx';
 import './SettingsApp.css';
 
 export default function SettingsApp() {
@@ -13,6 +14,10 @@ export default function SettingsApp() {
 
       <div className="settings-app__card">
         <SettingsForm />
+      </div>
+
+      <div className="settings-app__card">
+        <StrategyEditor />
       </div>
     </main>
   );
