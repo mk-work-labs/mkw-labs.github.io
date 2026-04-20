@@ -1,0 +1,41 @@
+// ベッティング法の共通インターフェース（仕様書 §4.3.4.7）。
+// サブクラスは全メソッドをオーバーライドする必要がある。
+export class BettingMethod {
+  constructor(baseBet) {
+    if (!Number.isFinite(baseBet) || baseBet <= 0) {
+      throw new Error(`baseBet must be a positive number (got ${baseBet})`);
+    }
+    this.baseBet = baseBet;
+  }
+
+  // 次にベットすべき金額を返す（通貨単位）
+  getNextBet() {
+    throw new Error('getNextBet() must be implemented by subclass');
+  }
+
+  // result: 'win' | 'loss' | 'push' | 'bj'
+  recordResult(_result) {
+    throw new Error('recordResult() must be implemented by subclass');
+  }
+
+  // 初期状態に戻す
+  reset() {
+    throw new Error('reset() must be implemented by subclass');
+  }
+
+  // 表示用の状態スナップショットを返す
+  getState() {
+    throw new Error('getState() must be implemented by subclass');
+  }
+}
+
+// 有効な勝敗結果の一覧。サブクラスの recordResult で使う。
+export const RESULTS = Object.freeze(['win', 'loss', 'push', 'bj']);
+
+export function assertValidResult(result) {
+  if (!RESULTS.includes(result)) {
+    throw new Error(
+      `Invalid result "${result}". Expected one of: ${RESULTS.join(', ')}`
+    );
+  }
+}
