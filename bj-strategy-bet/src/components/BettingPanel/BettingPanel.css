@@ -3,9 +3,9 @@
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
-  border: 1px solid #e5e5e5;
-  border-radius: 0.75rem;
-  background: #fafafa;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
 }
 
 .betting-panel__summary {
@@ -32,28 +32,28 @@
 }
 
 .betting-panel__summary-value--positive {
-  color: #16a34a;
+  color: var(--color-positive);
 }
 
 .betting-panel__summary-value--negative {
-  color: #dc2626;
+  color: var(--color-negative);
 }
 
 .betting-panel__fund-edit-btn {
   margin-left: 0.5rem;
   padding: 0.375rem 0.75rem;
   min-height: 2.25rem;
-  border-radius: 0.375rem;
-  border: 1px solid #d4d4d4;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-strong);
   background: transparent;
-  color: #555;
+  color: var(--color-text-secondary);
   font-size: 0.8rem;
   cursor: pointer;
   vertical-align: middle;
 }
 
 .betting-panel__fund-edit-btn:hover {
-  background: #f3f4f6;
+  background: var(--color-surface-alt);
   color: #222;
 }
 
@@ -67,7 +67,7 @@
   width: 8rem;
   padding: 0.25rem 0.5rem;
   border: 1px solid #bbb;
-  border-radius: 0.25rem;
+  border-radius: var(--radius-sm);
   font: inherit;
   font-variant-numeric: tabular-nums;
 }
@@ -75,17 +75,17 @@
 .betting-panel__fund-submit,
 .betting-panel__fund-cancel {
   padding: 0.25rem 0.625rem;
-  border-radius: 0.25rem;
+  border-radius: var(--radius-sm);
   border: 1px solid #bbb;
-  background: #fff;
+  background: var(--color-bg);
   cursor: pointer;
   font-size: 0.8rem;
 }
 
 .betting-panel__fund-submit {
-  background: #2563eb;
-  color: #fff;
-  border-color: #2563eb;
+  background: var(--color-bj);
+  color: var(--color-bg);
+  border-color: var(--color-bj);
 }
 
 .betting-panel__method {
@@ -93,7 +93,7 @@
   align-items: baseline;
   gap: 0.5rem;
   font-size: 0.85rem;
-  color: #555;
+  color: var(--color-text-secondary);
   padding: 0.25rem 0.125rem;
 }
 
@@ -111,9 +111,9 @@
   align-items: baseline;
   gap: 0.5rem;
   padding: 0.75rem 0.875rem;
-  border-radius: 0.5rem;
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
 }
 
 .betting-panel__next-bet-label {
@@ -125,11 +125,11 @@
   font-size: 1.5rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .betting-panel__next-bet-unit {
-  color: #888;
+  color: var(--color-text-muted);
   font-size: 0.85rem;
 }
 
@@ -140,11 +140,15 @@
 }
 
 .betting-panel__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
   min-height: 3rem;
   padding: 0.5rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-lg);
   border: 1px solid transparent;
-  color: #ffffff;
+  color: var(--color-bg);
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -160,19 +164,53 @@
   transform: translateY(1px);
 }
 
-.betting-panel__action--win  { background: #16a34a; }
-.betting-panel__action--loss { background: #dc2626; }
-.betting-panel__action--push { background: #6b7280; }
-.betting-panel__action--bj   { background: #2563eb; }
+.betting-panel__action:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.betting-panel__action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.22);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.betting-panel__action-label {
+  line-height: 1.1;
+}
+
+.betting-panel__action--win  { background: var(--color-win); }
+.betting-panel__action--loss { background: var(--color-loss); }
+.betting-panel__action--push { background: var(--color-push); }
+.betting-panel__action--bj {
+  background: var(--color-bj);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.14);
+}
+
+@media (max-width: 480px) {
+  .betting-panel__action {
+    min-height: 3.25rem;
+    font-size: 1rem;
+  }
+}
 
 .betting-panel__stats {
   display: flex;
   justify-content: space-between;
   gap: 0.5rem;
   font-size: 0.85rem;
-  color: #555;
+  color: var(--color-text-secondary);
   padding-top: 0.5rem;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid var(--color-border);
 }
 
 .betting-panel__footer {
@@ -183,8 +221,8 @@
 .betting-panel__reset {
   padding: 0.5rem 0.875rem;
   min-height: 2.5rem;
-  border-radius: 0.375rem;
-  border: 1px solid #d4d4d4;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-strong);
   background: transparent;
   color: #666;
   font-size: 0.8rem;
@@ -193,7 +231,7 @@
 }
 
 .betting-panel__reset:hover {
-  background: #f3f4f6;
+  background: var(--color-surface-alt);
   color: #333;
   border-color: #bbb;
 }

@@ -18,10 +18,10 @@
   position: relative;
   width: 100%;
   max-width: 30rem;
-  background: #ffffff;
-  border-radius: 1rem 1rem 0 0;
+  background: var(--color-bg);
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
   padding: 1rem 1rem 1.25rem;
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-sheet);
   animation: rank-picker-slide 0.2s ease-out;
 }
 
@@ -32,8 +32,8 @@
   .rank-picker__sheet {
     max-width: 24rem;
     margin: 0 1rem;
-    border-radius: 1rem;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-overlay);
     animation: rank-picker-scale 0.15s ease-out;
   }
 }
@@ -63,15 +63,15 @@
 .rank-picker__title {
   font-size: 1rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .rank-picker__close {
   width: 2.25rem;
   height: 2.25rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   border: none;
-  background: #f2f2f2;
+  background: var(--color-button-subtle);
   color: #333;
   font-size: 1.25rem;
   line-height: 1;
@@ -79,7 +79,7 @@
 }
 
 .rank-picker__close:hover {
-  background: #e4e4e4;
+  background: var(--color-button-subtle-hover);
 }
 
 .rank-picker__ranks {
@@ -90,10 +90,10 @@
 
 .rank-picker__rank {
   min-height: 3.25rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-lg);
   border: 1px solid #ccc;
-  background: #ffffff;
-  color: #1a1a1a;
+  background: var(--color-bg);
+  color: var(--color-text);
   font-size: 1.25rem;
   font-weight: 600;
   cursor: pointer;
@@ -101,7 +101,7 @@
 }
 
 .rank-picker__rank:hover {
-  background: #2563eb;
-  border-color: #2563eb;
-  color: #ffffff;
+  background: var(--color-bj);
+  border-color: var(--color-bj);
+  color: var(--color-bg);
 }

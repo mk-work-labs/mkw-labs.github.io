@@ -1,8 +1,8 @@
 .history-view__empty {
   padding: 2rem 1rem;
-  border: 1px dashed #d4d4d4;
-  border-radius: 0.75rem;
-  background: #fafafa;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
   text-align: center;
   color: #666;
 }
@@ -13,7 +13,7 @@
 
 .history-view__empty-hint {
   font-size: 0.85rem;
-  color: #888;
+  color: var(--color-text-muted);
 }
 
 .history-view__toolbar {
@@ -31,8 +31,8 @@
 .history-view__clear {
   padding: 0.5rem 0.875rem;
   min-height: 2.5rem;
-  border-radius: 0.375rem;
-  border: 1px solid #d4d4d4;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-strong);
   background: transparent;
   color: #666;
   font-size: 0.8rem;
@@ -40,7 +40,7 @@
 }
 
 .history-view__clear:hover {
-  background: #f3f4f6;
+  background: var(--color-surface-alt);
   color: #333;
   border-color: #bbb;
 }
@@ -59,9 +59,9 @@
   flex-direction: column;
   gap: 0.625rem;
   padding: 0.875rem 1rem;
-  border: 1px solid #e5e5e5;
-  border-radius: 0.75rem;
-  background: #fafafa;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
 }
 
 .history-card__header {
@@ -73,7 +73,7 @@
 
 .history-card__date {
   font-size: 0.85rem;
-  color: #555;
+  color: var(--color-text-secondary);
   font-variant-numeric: tabular-nums;
 }
 
@@ -84,11 +84,11 @@
 }
 
 .history-card__profit--positive {
-  color: #16a34a;
+  color: var(--color-positive);
 }
 
 .history-card__profit--negative {
-  color: #dc2626;
+  color: var(--color-negative);
 }
 
 .history-card__stats {
@@ -109,7 +109,7 @@
 
 .history-card__stat dt {
   font-size: 0.7rem;
-  color: #888;
+  color: var(--color-text-muted);
   letter-spacing: 0.02em;
 }
 
@@ -119,6 +119,19 @@
   font-variant-numeric: tabular-nums;
   color: #222;
   margin: 0;
+}
+
+@media (max-width: 480px) {
+  .history-card__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem 0.75rem;
+  }
+  .history-card__stat dt {
+    font-size: 0.75rem;
+  }
+  .history-card__stat dd {
+    font-size: 0.95rem;
+  }
 }
 
 .history-card__methods {
@@ -161,10 +174,10 @@
 .history-card__action {
   padding: 0.5rem 1rem;
   min-height: 2.5rem;
-  border-radius: 0.375rem;
-  border: 1px solid #2563eb;
-  background: #2563eb;
-  color: #fff;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-bj);
+  background: var(--color-bj);
+  color: var(--color-bg);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -176,14 +189,14 @@
 }
 
 .history-card__action:disabled {
-  background: #f3f4f6;
+  background: var(--color-surface-alt);
   color: #9ca3af;
-  border-color: #d4d4d4;
+  border-color: var(--color-border-strong);
   cursor: not-allowed;
   filter: none;
 }
 
 .history-card__action-hint {
   font-size: 0.75rem;
-  color: #888;
+  color: var(--color-text-muted);
 }

@@ -21,9 +21,9 @@
   align-items: center;
   gap: 0.375rem;
   padding: 0.5rem 0.625rem;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-md);
   border: 1px solid #ccc;
-  background: #ffffff;
+  background: var(--color-bg);
 }
 
 .settings-form__prefix {
@@ -43,15 +43,15 @@
 
 .settings-form__select {
   padding: 0.5rem 0.625rem;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-md);
   border: 1px solid #ccc;
-  background: #ffffff;
+  background: var(--color-bg);
   font: inherit;
 }
 
 .settings-form__hint {
   font-size: 0.75rem;
-  color: #888;
+  color: var(--color-text-muted);
   line-height: 1.5;
 }
 
@@ -62,10 +62,10 @@
 
 .settings-form__save {
   padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  border: 1px solid #2563eb;
-  background: #2563eb;
-  color: #ffffff;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-bj);
+  background: var(--color-bj);
+  color: var(--color-bg);
   font-weight: 600;
   cursor: pointer;
   min-height: 2.75rem;
@@ -77,9 +77,9 @@
 
 .settings-form__reset {
   padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-md);
   border: 1px solid #ccc;
-  background: #ffffff;
+  background: var(--color-bg);
   color: #444;
   font-size: 0.9rem;
   cursor: pointer;
@@ -87,21 +87,21 @@
 }
 
 .settings-form__reset:hover {
-  background: #f3f4f6;
+  background: var(--color-surface-alt);
 }
 
 .settings-form__saved {
-  color: #16a34a;
+  color: var(--color-positive);
   font-size: 0.85rem;
 }
 
 .settings-form__link {
   align-self: flex-start;
   padding: 0.5rem 0.75rem;
-  border-radius: 0.375rem;
-  border: 1px solid #d4d4d4;
-  background: #ffffff;
-  color: #1a1a1a;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-bg);
+  color: var(--color-text);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -109,5 +109,5 @@
 }
 
 .settings-form__link:hover {
-  background: #f3f4f6;
+  background: var(--color-surface-alt);
 }

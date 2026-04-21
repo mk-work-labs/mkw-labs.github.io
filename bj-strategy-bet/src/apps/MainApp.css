@@ -28,7 +28,7 @@
 
 .main-app__nav a,
 .main-app__nav-btn {
-  color: #555;
+  color: var(--color-text-secondary);
   text-decoration: none;
   font: inherit;
   padding: 0;
@@ -39,7 +39,7 @@
 
 .main-app__nav a:hover,
 .main-app__nav-btn:hover {
-  color: #1a1a1a;
+  color: var(--color-text);
   text-decoration: underline;
 }
 

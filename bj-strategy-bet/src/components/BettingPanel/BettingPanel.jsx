@@ -278,28 +278,32 @@ export default function BettingPanel({ onHandsChange } = {}) {
           className="betting-panel__action betting-panel__action--win"
           onClick={() => handleResult('win')}
         >
-          勝ち
+          <span className="betting-panel__action-icon" aria-hidden="true">✓</span>
+          <span className="betting-panel__action-label">勝ち</span>
         </button>
         <button
           type="button"
           className="betting-panel__action betting-panel__action--loss"
           onClick={() => handleResult('loss')}
         >
-          負け
+          <span className="betting-panel__action-icon" aria-hidden="true">✕</span>
+          <span className="betting-panel__action-label">負け</span>
         </button>
         <button
           type="button"
           className="betting-panel__action betting-panel__action--push"
           onClick={() => handleResult('push')}
         >
-          プッシュ
+          <span className="betting-panel__action-icon" aria-hidden="true">＝</span>
+          <span className="betting-panel__action-label">プッシュ</span>
         </button>
         <button
           type="button"
           className="betting-panel__action betting-panel__action--bj"
           onClick={() => handleResult('bj')}
         >
-          BJ
+          <span className="betting-panel__action-icon" aria-hidden="true">★</span>
+          <span className="betting-panel__action-label">BJ</span>
         </button>
       </div>
 
