@@ -1,11 +1,20 @@
+import HistoryView from '../components/History/HistoryView.jsx';
+import './HistoryApp.css';
+
 export default function HistoryApp() {
+  const handleRestore = () => {
+    window.location.href = './index.html';
+  };
+
   return (
-    <main style={{ padding: '1.5rem 1rem' }}>
-      <h1>履歴</h1>
-      <p>履歴画面（セッション一覧＋CSVエクスポート）のプレースホルダ</p>
-      <p style={{ marginTop: '1rem' }}>
-        <a href="./index.html">← メインへ戻る</a>
-      </p>
+    <main className="history-app">
+      <header className="history-app__header">
+        <h1 className="history-app__title">履歴</h1>
+        <a className="history-app__back" href="./index.html">
+          ← メインへ戻る
+        </a>
+      </header>
+      <HistoryView onRestore={handleRestore} />
     </main>
   );
 }

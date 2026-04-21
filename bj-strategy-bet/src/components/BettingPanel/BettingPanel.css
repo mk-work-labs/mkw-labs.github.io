@@ -41,12 +41,13 @@
 
 .betting-panel__fund-edit-btn {
   margin-left: 0.5rem;
-  padding: 0.125rem 0.5rem;
-  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  min-height: 2.25rem;
+  border-radius: 0.375rem;
   border: 1px solid #d4d4d4;
   background: transparent;
   color: #555;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   cursor: pointer;
   vertical-align: middle;
 }
@@ -180,7 +181,8 @@
 }
 
 .betting-panel__reset {
-  padding: 0.375rem 0.75rem;
+  padding: 0.5rem 0.875rem;
+  min-height: 2.5rem;
   border-radius: 0.375rem;
   border: 1px solid #d4d4d4;
   background: transparent;

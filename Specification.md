@@ -728,7 +728,6 @@ bj-strategy-bet/
 - [x] カード選択UI
 - [x] ストラテジー判定ロジック（無限デッキ・S17・サレンダーなし）
 - [x] 推奨アクション表示
-- [ ] 勝率表示 ※ 仕様検討中（`bj-strategy-bet/docs/win-rate-spec-notes.md`）
 - [x] バーネット法の実装
 - [x] 勝敗入力・次回ベット計算
 - [x] localStorage でのセッション保存
@@ -740,11 +739,10 @@ bj-strategy-bet/
 - [x] デプロイ URL 修正（project site 前提に Vite の base を訂正）
 
 ### Phase 2: 機能拡充
-- [ ] 収支グラフ
-- [ ] セッション履歴画面（+ リセット時の履歴アーカイブ）
-- [ ] CSV エクスポート
+- [x] **収支グラフ**（現行セッションの資金推移を SVG 折れ線で表示、`src/components/SessionChart/`）
+- [x] **セッション履歴画面**（`src/apps/HistoryApp.jsx`）+ **リセット時の履歴アーカイブ** + **任意セッションの復元**（`src/storage/history-storage.js`、history エントリに `snapshot` を保持）
 - [x] **ストラテジー表の編集機能**（設定画面から編集可能、`src/components/StrategyEditor/`、保存は `src/storage/strategy-storage.js`）
-- [ ] UI/UX のブラッシュアップ（モバイル最適化）
+- [x] **UI/UX のブラッシュアップ**（PC 768px 以上で 2 カラム化、HistoryApp/SettingsApp の PC 幅拡張、タップターゲット改善）
 
 **Phase 2 前段として実装済み**
 - [x] 設定画面の基本実装（初期資金・ベースベット・ベッティング法選択）
@@ -766,6 +764,7 @@ bj-strategy-bet/
 - [x] ベッティング法レジストリ（`src/logic/betting/registry.js`、プラグイン辞書）
 
 ### Phase 4: 高度な機能（将来構想）
+- [ ] 勝率表示 ※ 仕様検討中（`bj-strategy-bet/docs/win-rate-spec-notes.md`）
 - [ ] 期待値（EV）表示
 - [ ] ストラテジー表の学習モード
 - [ ] カスタムストラテジー表のインポート/エクスポート（JSON形式）

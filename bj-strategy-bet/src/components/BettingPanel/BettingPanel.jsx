@@ -9,6 +9,7 @@ import {
   loadSession,
   saveSession,
 } from '../../storage/session-storage.js';
+import { archiveSession } from '../../storage/history-storage.js';
 import './BettingPanel.css';
 
 function formatYen(n) {
@@ -45,7 +46,7 @@ function describeMethodState(methodState) {
   return `連勝 ${methodState.consecutiveWins ?? 0}`;
 }
 
-export default function BettingPanel() {
+export default function BettingPanel({ onHandsChange } = {}) {
   // 起動時に設定とセッションを解決。settings のメソッドと session の
   // currentMethod が異なる場合、method を切替えた扱い（新規初期化）
   const bootstrapRef = useRef(null);
@@ -106,7 +107,8 @@ export default function BettingPanel() {
       hands,
       methodSwitches: initialSession.methodSwitches ?? [],
     });
-  }, [startedAt, settings, activeMethodId, fund, hands, methodState, initialSession]);
+    onHandsChange?.(hands);
+  }, [startedAt, settings, activeMethodId, fund, hands, methodState, initialSession, onHandsChange]);
 
   const stats = useMemo(() => {
     const decided = hands.filter((h) => h.result !== 'push');
@@ -147,9 +149,18 @@ export default function BettingPanel() {
   const handleReset = () => {
     if (hands.length > 0) {
       const ok = window.confirm(
-        '現在のセッションをリセットしますか？\n資金・履歴・連勝数がすべて初期化されます。'
+        '現在のセッションをリセットしますか？\n資金・履歴・連勝数がすべて初期化されます。\n現在のセッションは履歴に保存されます。'
       );
       if (!ok) return;
+      archiveSession({
+        startedAt,
+        initialFund: settings.initialFund,
+        baseBet: settings.baseBet,
+        currentFund: fund,
+        currentMethod: activeMethodId,
+        hands,
+        methodSwitches: initialSession.methodSwitches ?? [],
+      });
     }
     method.reset();
     setMethodState(method.getState());
