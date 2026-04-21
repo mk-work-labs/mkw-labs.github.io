@@ -1,18 +1,19 @@
 import { BarnettMethod } from './barnett.js';
 import { MonteCarloMethod } from './montecarlo.js';
 import { GoodmanMethod } from './goodman.js';
+import { OscarsGrindMethod } from './oscarsgrind.js';
+import { TenPercentMethod } from './tenpercent.js';
+import { ParlayMethod } from './parlay.js';
 
 // ベッティング法のレジストリ。
 // implemented=false はセレクターに並べるが選択不可として「将来像」を示す。
 export const METHODS = Object.freeze([
-  { id: 'barnett',     label: 'バーネット法（1-3-2-6）',    implemented: true,  ctor: BarnettMethod },
-  { id: 'montecarlo',  label: 'モンテカルロ法（数列式）',  implemented: true,  ctor: MonteCarloMethod },
-  { id: 'goodman',     label: 'グッドマン法（1-2-3-5）',   implemented: true,  ctor: GoodmanMethod },
-  { id: 'martingale',  label: 'マーチンゲール法',           implemented: false, ctor: null },
-  { id: 'parlay',      label: 'パーレー法',                 implemented: false, ctor: null },
-  { id: 'kokomo',      label: 'ココモ法',                   implemented: false, ctor: null },
-  { id: 'oscarsgrind', label: 'オスカーズグラインド法',    implemented: false, ctor: null },
-  { id: 'tenpercent',  label: '10% 法',                     implemented: false, ctor: null },
+  { id: 'barnett',     label: 'バーネット法（1-3-2-6）',      implemented: true, ctor: BarnettMethod },
+  { id: 'montecarlo',  label: 'モンテカルロ法（数列式）',    implemented: true, ctor: MonteCarloMethod },
+  { id: 'goodman',     label: 'グッドマン法（1-2-3-5）',     implemented: true, ctor: GoodmanMethod },
+  { id: 'oscarsgrind', label: 'オスカーズグラインド法',      implemented: true, ctor: OscarsGrindMethod },
+  { id: 'tenpercent',  label: '10% 法',                      implemented: true, ctor: TenPercentMethod },
+  { id: 'parlay',      label: 'パーレー法（1-2-4）',         implemented: true, ctor: ParlayMethod },
 ]);
 
 export const DEFAULT_METHOD_ID = 'barnett';

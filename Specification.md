@@ -398,9 +398,7 @@ export function judgeAction(playerCards, dealerCard) {
 
 #### 4.3.3 拡張性
 今後、以下のようなベッティング法を追加予定：
-- マーチンゲール法
 - パーレー法
-- ココモ法
 - モンテカルロ法
 - オスカーズグラインド法
 - 10%法
@@ -751,13 +749,15 @@ bj-strategy-bet/
 - [x] ベッティング法切替え（§4.3.4.1 準拠の簡易版。資金は引き継ぎ、新メソッドは初期状態）
 
 ### Phase 3: ベッティング法追加
-- [ ] マーチンゲール法
-- [ ] パーレー法
-- [ ] ココモ法
 - [x] モンテカルロ法（数列式、`src/logic/betting/montecarlo.js`）
-- [ ] オスカーズグラインド法
-- [ ] 10% 法
+- [x] オスカーズグラインド法（`src/logic/betting/oscarsgrind.js`）
+- [x] 10% 法（`src/logic/betting/tenpercent.js`、`fund` コンテキスト依存）
+- [x] パーレー法（1-2-4 の 3 ステップ版、`src/logic/betting/parlay.js`）
 - [ ] セッション内切替え履歴（§4.3.4.3 の `methodSwitches` 本実装）
+
+**見送り**
+- マーチンゲール法: BJ ではダブル/スプリットとの相互作用で破綻リスクが大きく、実用性が低いため不採用
+- ココモ法: 3 倍配当ゲーム向けの手法で、BJ（1:1・BJ 1.5 倍）とは理論前提が合わないため不採用
 
 **TODO外で追加済み**
 - [x] グッドマン法（1-2-3-5 累進、`src/logic/betting/goodman.js`）

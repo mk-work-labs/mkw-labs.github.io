@@ -37,11 +37,23 @@ function buildInitialSession(settings, methodId) {
   };
 }
 
-// メソッド固有の状態表記（バーネット/グッドマンは「連勝 N」、モンテカルロは数列）
+function formatUnitsSigned(units) {
+  if (!Number.isFinite(units) || units === 0) return '0';
+  const n = Math.round(units * 10) / 10;
+  return n > 0 ? `+${n}` : `${n}`;
+}
+
+// メソッド固有の状態表記（連勝数・サイクル収支・数列など）
 function describeMethodState(methodState) {
   if (!methodState) return null;
   if (methodState.name === 'montecarlo') {
     return `数列 [${methodState.sequence.join(', ')}]`;
+  }
+  if (methodState.name === 'oscarsgrind') {
+    return `サイクル収支 ${formatUnitsSigned(methodState.cycleProfitUnits)}u`;
+  }
+  if (methodState.name === 'tenpercent') {
+    return '資金の 10%';
   }
   return `連勝 ${methodState.consecutiveWins ?? 0}`;
 }
@@ -81,7 +93,9 @@ export default function BettingPanel({ onHandsChange } = {}) {
   const [startedAt, setStartedAt] = useState(initialSession.startedAt);
   const [fund, setFund] = useState(initialSession.currentFund);
   const [hands, setHands] = useState(initialSession.hands ?? []);
-  const [methodState, setMethodState] = useState(() => method.getState());
+  const [methodState, setMethodState] = useState(() =>
+    method.getState({ fund: initialSession.currentFund })
+  );
 
   // 資金編集
   const [editingFund, setEditingFund] = useState(false);
@@ -126,12 +140,12 @@ export default function BettingPanel({ onHandsChange } = {}) {
   const profit = fund - settings.initialFund;
 
   const handleResult = (result) => {
-    const bet = method.getNextBet();
+    const bet = method.getNextBet({ fund });
     const delta = fundDelta(result, bet);
     const nextFund = fund + delta;
 
     method.recordResult(result);
-    setMethodState(method.getState());
+    setMethodState(method.getState({ fund: nextFund }));
     setFund(nextFund);
     setHands((prev) => [
       ...prev,
@@ -163,7 +177,7 @@ export default function BettingPanel({ onHandsChange } = {}) {
       });
     }
     method.reset();
-    setMethodState(method.getState());
+    setMethodState(method.getState({ fund: settings.initialFund }));
     setFund(settings.initialFund);
     setHands([]);
     setStartedAt(new Date().toISOString());
@@ -187,7 +201,10 @@ export default function BettingPanel({ onHandsChange } = {}) {
       cancelEditFund();
       return;
     }
-    setFund(Math.trunc(n));
+    const newFund = Math.trunc(n);
+    setFund(newFund);
+    // 10% 法などは fund 依存で次回ベットが決まるため、編集時も再計算する
+    setMethodState(method.getState({ fund: newFund }));
     cancelEditFund();
   };
 
