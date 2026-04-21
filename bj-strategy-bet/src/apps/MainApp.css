@@ -28,7 +28,7 @@
 
 .main-app__nav a,
 .main-app__nav-btn {
-  color: #555;
+  color: var(--color-text-secondary);
   text-decoration: none;
   font: inherit;
   padding: 0;
@@ -39,6 +39,44 @@
 
 .main-app__nav a:hover,
 .main-app__nav-btn:hover {
-  color: #1a1a1a;
+  color: var(--color-text);
   text-decoration: underline;
+}
+
+@media (min-width: 768px) {
+  .main-app {
+    max-width: 60rem;
+    padding: 2rem 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1.5rem;
+    row-gap: 1.25rem;
+    align-items: start;
+  }
+
+  .main-app__header {
+    grid-column: 1 / -1;
+  }
+
+  .main-app > .strategy-panel {
+    grid-column: 1;
+    grid-row: 2 / span 2;
+    align-self: start;
+  }
+
+  .main-app > .betting-panel {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+  }
+
+  .main-app > .session-chart {
+    grid-column: 2;
+    grid-row: 3;
+    align-self: start;
+  }
+
+  .main-app__nav {
+    grid-column: 1 / -1;
+  }
 }

@@ -1,3 +1,55 @@
+:root {
+  /* neutral palette */
+  --color-bg: #ffffff;
+  --color-surface: #fafafa;
+  --color-surface-alt: #f3f4f6;
+  --color-surface-muted: #f5f5f5;
+  --color-border: #e5e5e5;
+  --color-border-strong: #d4d4d4;
+  --color-button-subtle: #f2f2f2;
+  --color-button-subtle-hover: #e4e4e4;
+  --color-text: #1a1a1a;
+  --color-text-secondary: #555;
+  --color-text-muted: #888;
+
+  /* semantic (betting result) */
+  --color-win: #16a34a;
+  --color-loss: #dc2626;
+  --color-push: #6b7280;
+  --color-bj: #2563eb;
+
+  /* semantic (profit/loss) */
+  --color-positive: #16a34a;
+  --color-negative: #dc2626;
+
+  /* semantic (strategy action) — 背景+前景のペアで定義 */
+  --color-hit-bg: #dbeafe;
+  --color-hit-fg: #1d4ed8;
+  --color-stand-bg: #fee2e2;
+  --color-stand-fg: #b91c1c;
+  --color-double-bg: #dcfce7;
+  --color-double-fg: #15803d;
+  --color-split-bg: #ffedd5;
+  --color-split-fg: #c2410c;
+
+  /* radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-full: 9999px;
+
+  /* shadow */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.15);
+  --shadow-overlay: 0 12px 32px rgba(0, 0, 0, 0.2);
+  --shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.12);
+
+  /* focus ring */
+  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.45);
+}
+
 *,
 *::before,
 *::after {
@@ -12,8 +64,8 @@ body {
 }
 
 body {
-  background-color: #ffffff;
-  color: #1a1a1a;
+  background-color: var(--color-bg);
+  color: var(--color-text);
   font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
     "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, Arial,
     sans-serif;
@@ -23,7 +75,7 @@ body {
 }
 
 a {
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 button {

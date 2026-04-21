@@ -13,7 +13,7 @@
 .card-selector__label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #555;
+  color: var(--color-text-secondary);
   letter-spacing: 0.04em;
 }
 
@@ -27,12 +27,12 @@
 .card-slot {
   width: 3.5rem;
   height: 4.75rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-lg);
   border: 2px solid #bbb;
-  background: #fff;
+  background: var(--color-bg);
   font-size: 1.75rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -52,16 +52,16 @@
 }
 
 .card-slot:hover {
-  border-color: #2563eb;
+  border-color: var(--color-bj);
 }
 
 .card-selector__add {
   width: 2.75rem;
   height: 2.75rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-lg);
   border: 2px dashed #bbb;
-  background: #fff;
-  color: #555;
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
@@ -69,8 +69,8 @@
 }
 
 .card-selector__add:hover:not(:disabled) {
-  border-color: #2563eb;
-  color: #2563eb;
+  border-color: var(--color-bj);
+  color: var(--color-bj);
 }
 
 .card-selector__add:disabled {
@@ -81,9 +81,9 @@
 .card-selector__clear {
   margin-left: auto;
   padding: 0.5rem 0.875rem;
-  border-radius: 0.375rem;
+  border-radius: var(--radius-md);
   border: 1px solid #ccc;
-  background: #f5f5f5;
+  background: var(--color-surface-muted);
   color: #333;
   font-size: 0.9rem;
   cursor: pointer;

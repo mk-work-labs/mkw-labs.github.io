@@ -20,10 +20,10 @@
   max-width: 30rem;
   max-height: 90vh;
   overflow-y: auto;
-  background: #ffffff;
-  border-radius: 1rem 1rem 0 0;
+  background: var(--color-bg);
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
   padding: 1rem 1rem 1.25rem;
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-sheet);
   animation: settings-overlay-slide 0.2s ease-out;
 }
 
@@ -34,8 +34,8 @@
   .settings-overlay__sheet {
     max-width: 26rem;
     margin: 0 1rem;
-    border-radius: 1rem;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-overlay);
     animation: settings-overlay-scale 0.15s ease-out;
   }
 }
@@ -65,15 +65,15 @@
 .settings-overlay__title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .settings-overlay__close {
   width: 2.25rem;
   height: 2.25rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   border: none;
-  background: #f2f2f2;
+  background: var(--color-button-subtle);
   color: #333;
   font-size: 1.25rem;
   line-height: 1;
@@ -81,7 +81,7 @@
 }
 
 .settings-overlay__close:hover {
-  background: #e4e4e4;
+  background: var(--color-button-subtle-hover);
 }
 
 .settings-overlay__body {

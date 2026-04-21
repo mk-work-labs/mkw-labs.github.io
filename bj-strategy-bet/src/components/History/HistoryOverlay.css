@@ -1,72 +1,84 @@
-.rank-picker {
+.history-overlay {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 40;
   display: flex;
   align-items: flex-end;
   justify-content: center;
 }
 
-.rank-picker__backdrop {
+.history-overlay__backdrop {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
-  animation: rank-picker-fade 0.15s ease-out;
+  animation: history-overlay-fade 0.15s ease-out;
 }
 
-.rank-picker__sheet {
+.history-overlay__sheet {
   position: relative;
   width: 100%;
   max-width: 30rem;
+  max-height: 90vh;
+  overflow-y: auto;
   background: var(--color-bg);
   border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
   padding: 1rem 1rem 1.25rem;
   box-shadow: var(--shadow-sheet);
-  animation: rank-picker-slide 0.2s ease-out;
+  animation: history-overlay-slide 0.2s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 @media (min-width: 640px) {
-  .rank-picker {
+  .history-overlay {
     align-items: center;
   }
-  .rank-picker__sheet {
-    max-width: 24rem;
+  .history-overlay__sheet {
+    max-width: 32rem;
     margin: 0 1rem;
     border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-overlay);
-    animation: rank-picker-scale 0.15s ease-out;
+    animation: history-overlay-scale 0.15s ease-out;
   }
 }
 
-@keyframes rank-picker-fade {
+@media (min-width: 768px) {
+  .history-overlay__sheet {
+    max-width: 40rem;
+  }
+}
+
+@keyframes history-overlay-fade {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
-@keyframes rank-picker-slide {
+@keyframes history-overlay-slide {
   from { transform: translateY(100%); }
   to   { transform: translateY(0); }
 }
 
-@keyframes rank-picker-scale {
+@keyframes history-overlay-scale {
   from { transform: scale(0.96); opacity: 0; }
   to   { transform: scale(1); opacity: 1; }
 }
 
-.rank-picker__header {
+.history-overlay__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
+  margin-bottom: 0.25rem;
 }
 
-.rank-picker__title {
-  font-size: 1rem;
+.history-overlay__title {
+  font-size: 1.125rem;
   font-weight: 600;
   color: var(--color-text);
+  margin: 0;
 }
 
-.rank-picker__close {
+.history-overlay__close {
   width: 2.25rem;
   height: 2.25rem;
   border-radius: var(--radius-full);
@@ -78,30 +90,12 @@
   cursor: pointer;
 }
 
-.rank-picker__close:hover {
+.history-overlay__close:hover {
   background: var(--color-button-subtle-hover);
 }
 
-.rank-picker__ranks {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0.5rem;
-}
-
-.rank-picker__rank {
-  min-height: 3.25rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid #ccc;
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-size: 1.25rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
-
-.rank-picker__rank:hover {
-  background: var(--color-bj);
-  border-color: var(--color-bj);
-  color: var(--color-bg);
+.history-overlay__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
