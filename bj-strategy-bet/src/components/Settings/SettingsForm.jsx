@@ -1,16 +1,37 @@
 import { useState } from 'react';
-import { METHODS } from '../../logic/betting/registry.js';
+import { METHODS, getMethodLabel } from '../../logic/betting/registry.js';
 import {
   DEFAULT_SETTINGS,
   loadSettings,
   saveSettings,
 } from '../../storage/settings-storage.js';
+import { loadSession } from '../../storage/session-storage.js';
 import './SettingsForm.css';
 
 function parsePositiveInt(value, fallback) {
   const n = Math.trunc(Number(String(value).replace(/[^\d-]/g, '')));
   if (!Number.isFinite(n) || n <= 0) return fallback;
   return n;
+}
+
+// hands 末尾から連続する win(+bj) または loss を数える。push はスキップ。
+function computeTailStreak(hands) {
+  let length = 0;
+  let kind = null;
+  for (let i = hands.length - 1; i >= 0; i--) {
+    const h = hands[i];
+    if (h.result === 'push') continue;
+    const k = h.result === 'win' || h.result === 'bj' ? 'win' : 'loss';
+    if (kind === null) {
+      kind = k;
+      length = 1;
+    } else if (k === kind) {
+      length += 1;
+    } else {
+      break;
+    }
+  }
+  return { length, kind };
 }
 
 // ページ版とオーバーレイ版で共用するフォーム本体。
@@ -32,6 +53,28 @@ export default function SettingsForm({ onSaved, onEditStrategy }) {
       initialFund: parsePositiveInt(form.initialFund, DEFAULT_SETTINGS.initialFund),
       baseBet: parsePositiveInt(form.baseBet, DEFAULT_SETTINGS.baseBet),
     };
+
+    // §4.3.4.6: ベッティング法の変更で連勝/連敗中なら誤操作防止の確認を出す
+    const current = loadSession();
+    const isMethodChanged =
+      current &&
+      current.currentMethod &&
+      current.currentMethod !== normalized.bettingMethod &&
+      Array.isArray(current.hands) &&
+      current.hands.length > 0;
+    if (isMethodChanged) {
+      const streak = computeTailStreak(current.hands);
+      if (streak.length >= 2) {
+        const label = streak.kind === 'win' ? '連勝' : '連敗';
+        const ok = window.confirm(
+          `現在 ${streak.length} ${label}中です。\n` +
+            `「${getMethodLabel(current.currentMethod)}」から「${getMethodLabel(normalized.bettingMethod)}」へ切替えますか？\n` +
+            '新しいメソッドは初期状態から開始します（資金は引き継がれます）。'
+        );
+        if (!ok) return;
+      }
+    }
+
     setForm(normalized);
     saveSettings(normalized);
     setSavedAt(new Date());

@@ -753,7 +753,7 @@ bj-strategy-bet/
 - [x] オスカーズグラインド法（`src/logic/betting/oscarsgrind.js`）
 - [x] 10% 法（`src/logic/betting/tenpercent.js`、`fund` コンテキスト依存）
 - [x] パーレー法（1-2-4 の 3 ステップ版、`src/logic/betting/parlay.js`）
-- [ ] セッション内切替え履歴（§4.3.4.3 の `methodSwitches` 本実装）
+- [x] セッション内切替え履歴（§4.3.4.3 の `methodSwitches` 本実装 / §4.3.4.5 グラフ上のマーカー / §4.3.4.6 連勝・連敗中の切替え確認ダイアログ）
 
 **見送り**
 - マーチンゲール法: BJ ではダブル/スプリットとの相互作用で破綻リスクが大きく、実用性が低いため不採用

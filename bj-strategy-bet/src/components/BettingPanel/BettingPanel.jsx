@@ -58,16 +58,34 @@ function describeMethodState(methodState) {
   return `連勝 ${methodState.consecutiveWins ?? 0}`;
 }
 
-export default function BettingPanel({ onHandsChange } = {}) {
+export default function BettingPanel({ onSessionChange } = {}) {
   // 起動時に設定とセッションを解決。settings のメソッドと session の
-  // currentMethod が異なる場合、method を切替えた扱い（新規初期化）
+  // currentMethod が異なる場合、method を切替えた扱い（新規初期化＋履歴追記）
   const bootstrapRef = useRef(null);
   if (bootstrapRef.current === null) {
     const settings = loadSettings();
     const activeMethodId = resolveMethodId(settings.bettingMethod);
     const stored = loadSession();
-    const session = stored ?? buildInitialSession(settings, activeMethodId);
-    const switched = session.currentMethod !== activeMethodId;
+    const baseSession = stored ?? buildInitialSession(settings, activeMethodId);
+    // 初回（session 未保存）は currentMethod 不整合があっても「切替え」ではなく初期選択扱い
+    const switched = stored != null && baseSession.currentMethod !== activeMethodId;
+
+    let session = baseSession;
+    if (switched) {
+      const switchRecord = {
+        atHandId: (baseSession.hands?.length ?? 0) + 1,
+        from: baseSession.currentMethod,
+        to: activeMethodId,
+        timestamp: new Date().toISOString(),
+      };
+      session = {
+        ...baseSession,
+        currentMethod: activeMethodId,
+        methodSwitches: [...(baseSession.methodSwitches ?? []), switchRecord],
+      };
+      saveSession(session);
+    }
+
     bootstrapRef.current = {
       settings,
       activeMethodId,
@@ -93,6 +111,9 @@ export default function BettingPanel({ onHandsChange } = {}) {
   const [startedAt, setStartedAt] = useState(initialSession.startedAt);
   const [fund, setFund] = useState(initialSession.currentFund);
   const [hands, setHands] = useState(initialSession.hands ?? []);
+  const [methodSwitches, setMethodSwitches] = useState(
+    initialSession.methodSwitches ?? []
+  );
   const [methodState, setMethodState] = useState(() =>
     method.getState({ fund: initialSession.currentFund })
   );
@@ -119,10 +140,10 @@ export default function BettingPanel({ onHandsChange } = {}) {
         },
       },
       hands,
-      methodSwitches: initialSession.methodSwitches ?? [],
+      methodSwitches,
     });
-    onHandsChange?.(hands);
-  }, [startedAt, settings, activeMethodId, fund, hands, methodState, initialSession, onHandsChange]);
+    onSessionChange?.({ hands, methodSwitches });
+  }, [startedAt, settings, activeMethodId, fund, hands, methodState, methodSwitches, initialSession, onSessionChange]);
 
   const stats = useMemo(() => {
     const decided = hands.filter((h) => h.result !== 'push');
@@ -173,13 +194,14 @@ export default function BettingPanel({ onHandsChange } = {}) {
         currentFund: fund,
         currentMethod: activeMethodId,
         hands,
-        methodSwitches: initialSession.methodSwitches ?? [],
+        methodSwitches,
       });
     }
     method.reset();
     setMethodState(method.getState({ fund: settings.initialFund }));
     setFund(settings.initialFund);
     setHands([]);
+    setMethodSwitches([]);
     setStartedAt(new Date().toISOString());
   };
 
