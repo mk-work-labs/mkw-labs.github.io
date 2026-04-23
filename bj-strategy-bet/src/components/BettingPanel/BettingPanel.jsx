@@ -100,7 +100,7 @@ export default function BettingPanel({ onSessionChange } = {}) {
   // activeMethodId 固定の前提でライフタイム中 1 つだけ保持
   const methodRef = useRef(null);
   if (methodRef.current === null) {
-    const m = createMethod(activeMethodId, settings.baseBet);
+    const m = createMethod(activeMethodId, settings.baseBet, settings.methodOptions);
     if (!switched) {
       m.restore(initialSession.methodState?.[activeMethodId]);
     }
