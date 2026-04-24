@@ -37,25 +37,55 @@ function buildInitialSession(settings, methodId) {
   };
 }
 
-// メソッド固有の状態表記（バーネット/グッドマンは「連勝 N」、モンテカルロは数列）
+function formatUnitsSigned(units) {
+  if (!Number.isFinite(units) || units === 0) return '0';
+  const n = Math.round(units * 10) / 10;
+  return n > 0 ? `+${n}` : `${n}`;
+}
+
+// メソッド固有の状態表記（連勝数・サイクル収支・数列など）
 function describeMethodState(methodState) {
   if (!methodState) return null;
   if (methodState.name === 'montecarlo') {
     return `数列 [${methodState.sequence.join(', ')}]`;
   }
+  if (methodState.name === 'oscarsgrind') {
+    return `サイクル収支 ${formatUnitsSigned(methodState.cycleProfitUnits)}u`;
+  }
+  if (methodState.name === 'tenpercent') {
+    return '資金の 10%';
+  }
   return `連勝 ${methodState.consecutiveWins ?? 0}`;
 }
 
-export default function BettingPanel({ onHandsChange } = {}) {
+export default function BettingPanel({ onSessionChange } = {}) {
   // 起動時に設定とセッションを解決。settings のメソッドと session の
-  // currentMethod が異なる場合、method を切替えた扱い（新規初期化）
+  // currentMethod が異なる場合、method を切替えた扱い（新規初期化＋履歴追記）
   const bootstrapRef = useRef(null);
   if (bootstrapRef.current === null) {
     const settings = loadSettings();
     const activeMethodId = resolveMethodId(settings.bettingMethod);
     const stored = loadSession();
-    const session = stored ?? buildInitialSession(settings, activeMethodId);
-    const switched = session.currentMethod !== activeMethodId;
+    const baseSession = stored ?? buildInitialSession(settings, activeMethodId);
+    // 初回（session 未保存）は currentMethod 不整合があっても「切替え」ではなく初期選択扱い
+    const switched = stored != null && baseSession.currentMethod !== activeMethodId;
+
+    let session = baseSession;
+    if (switched) {
+      const switchRecord = {
+        atHandId: (baseSession.hands?.length ?? 0) + 1,
+        from: baseSession.currentMethod,
+        to: activeMethodId,
+        timestamp: new Date().toISOString(),
+      };
+      session = {
+        ...baseSession,
+        currentMethod: activeMethodId,
+        methodSwitches: [...(baseSession.methodSwitches ?? []), switchRecord],
+      };
+      saveSession(session);
+    }
+
     bootstrapRef.current = {
       settings,
       activeMethodId,
@@ -70,7 +100,7 @@ export default function BettingPanel({ onHandsChange } = {}) {
   // activeMethodId 固定の前提でライフタイム中 1 つだけ保持
   const methodRef = useRef(null);
   if (methodRef.current === null) {
-    const m = createMethod(activeMethodId, settings.baseBet);
+    const m = createMethod(activeMethodId, settings.baseBet, settings.methodOptions);
     if (!switched) {
       m.restore(initialSession.methodState?.[activeMethodId]);
     }
@@ -81,7 +111,12 @@ export default function BettingPanel({ onHandsChange } = {}) {
   const [startedAt, setStartedAt] = useState(initialSession.startedAt);
   const [fund, setFund] = useState(initialSession.currentFund);
   const [hands, setHands] = useState(initialSession.hands ?? []);
-  const [methodState, setMethodState] = useState(() => method.getState());
+  const [methodSwitches, setMethodSwitches] = useState(
+    initialSession.methodSwitches ?? []
+  );
+  const [methodState, setMethodState] = useState(() =>
+    method.getState({ fund: initialSession.currentFund })
+  );
 
   // 資金編集
   const [editingFund, setEditingFund] = useState(false);
@@ -105,10 +140,10 @@ export default function BettingPanel({ onHandsChange } = {}) {
         },
       },
       hands,
-      methodSwitches: initialSession.methodSwitches ?? [],
+      methodSwitches,
     });
-    onHandsChange?.(hands);
-  }, [startedAt, settings, activeMethodId, fund, hands, methodState, initialSession, onHandsChange]);
+    onSessionChange?.({ hands, methodSwitches });
+  }, [startedAt, settings, activeMethodId, fund, hands, methodState, methodSwitches, initialSession, onSessionChange]);
 
   const stats = useMemo(() => {
     const decided = hands.filter((h) => h.result !== 'push');
@@ -126,12 +161,12 @@ export default function BettingPanel({ onHandsChange } = {}) {
   const profit = fund - settings.initialFund;
 
   const handleResult = (result) => {
-    const bet = method.getNextBet();
+    const bet = method.getNextBet({ fund });
     const delta = fundDelta(result, bet);
     const nextFund = fund + delta;
 
     method.recordResult(result);
-    setMethodState(method.getState());
+    setMethodState(method.getState({ fund: nextFund }));
     setFund(nextFund);
     setHands((prev) => [
       ...prev,
@@ -159,13 +194,14 @@ export default function BettingPanel({ onHandsChange } = {}) {
         currentFund: fund,
         currentMethod: activeMethodId,
         hands,
-        methodSwitches: initialSession.methodSwitches ?? [],
+        methodSwitches,
       });
     }
     method.reset();
-    setMethodState(method.getState());
+    setMethodState(method.getState({ fund: settings.initialFund }));
     setFund(settings.initialFund);
     setHands([]);
+    setMethodSwitches([]);
     setStartedAt(new Date().toISOString());
   };
 
@@ -187,7 +223,10 @@ export default function BettingPanel({ onHandsChange } = {}) {
       cancelEditFund();
       return;
     }
-    setFund(Math.trunc(n));
+    const newFund = Math.trunc(n);
+    setFund(newFund);
+    // 10% 法などは fund 依存で次回ベットが決まるため、編集時も再計算する
+    setMethodState(method.getState({ fund: newFund }));
     cancelEditFund();
   };
 

@@ -16,7 +16,7 @@ function formatAxisValue(n) {
 
 // hands と initialFund から SVG 描画に必要な座標群を算出。
 // 最左端を initialFund とし、以降は hands[].fundAfter を等間隔に並べる。
-function buildChart(hands, initialFund) {
+function buildChart(hands, initialFund, methodSwitches) {
   const funds = [initialFund, ...hands.map((h) => h.fundAfter)];
   const dataMin = Math.min(...funds);
   const dataMax = Math.max(...funds);
@@ -41,6 +41,25 @@ function buildChart(hands, initialFund) {
     .join(' ');
   const lastPoint = hands.length > 0 ? points[points.length - 1] : null;
 
+  // 切替えマーカー: atHandId=N はハンド N の直前の境界 → funds[N-1] と funds[N] の中点に縦線
+  const switches = (methodSwitches ?? [])
+    .map((sw) => {
+      const idx = Number(sw.atHandId) - 1;
+      if (!Number.isFinite(idx) || idx < 0 || idx >= funds.length) return null;
+      const x =
+        idx === funds.length - 1
+          ? xOf(idx)
+          : (xOf(idx) + xOf(idx + 1)) / 2;
+      return {
+        x,
+        from: sw.from,
+        to: sw.to,
+        atHandId: sw.atHandId,
+        timestamp: sw.timestamp,
+      };
+    })
+    .filter(Boolean);
+
   return {
     path,
     lastPoint,
@@ -53,13 +72,14 @@ function buildChart(hands, initialFund) {
     finalHandId: hands.length,
     xFirst: xOf(1),
     xLast: xOf(funds.length - 1),
+    switches,
   };
 }
 
-export default function SessionChart({ hands, initialFund }) {
+export default function SessionChart({ hands, initialFund, methodSwitches }) {
   const chart = useMemo(
-    () => buildChart(hands, initialFund),
-    [hands, initialFund]
+    () => buildChart(hands, initialFund, methodSwitches),
+    [hands, initialFund, methodSwitches]
   );
 
   const isEmpty = hands.length === 0;
@@ -104,6 +124,24 @@ export default function SessionChart({ hands, initialFund }) {
           strokeDasharray="4 4"
           strokeWidth="1"
         />
+
+        {/* ベッティング法の切替え地点（§4.3.4.5） */}
+        {chart.switches.map((sw, i) => (
+          <line
+            key={`switch-${i}-${sw.timestamp ?? sw.atHandId}`}
+            x1={sw.x}
+            y1={chart.yTop}
+            x2={sw.x}
+            y2={chart.yBottom}
+            stroke="#f59e0b"
+            strokeWidth="1"
+            strokeDasharray="2 3"
+          >
+            <title>
+              {`ハンド${sw.atHandId} 切替え: ${sw.from ?? '?'} → ${sw.to ?? '?'}`}
+            </title>
+          </line>
+        ))}
 
         {/* 折れ線 */}
         {!isEmpty && (
