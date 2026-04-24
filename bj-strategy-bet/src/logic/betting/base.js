@@ -9,7 +9,8 @@ export class BettingMethod {
   }
 
   // 次にベットすべき金額を返す（通貨単位）
-  getNextBet() {
+  // context: { fund?: number } — 10% 法など資金依存メソッド向け。他メソッドは無視する
+  getNextBet(_context) {
     throw new Error('getNextBet() must be implemented by subclass');
   }
 
@@ -23,8 +24,9 @@ export class BettingMethod {
     throw new Error('reset() must be implemented by subclass');
   }
 
-  // 表示用の状態スナップショットを返す
-  getState() {
+  // 表示用の状態スナップショットを返す。
+  // context は getNextBet と同じ（nextBet 算出に使う）
+  getState(_context) {
     throw new Error('getState() must be implemented by subclass');
   }
 }
