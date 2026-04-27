@@ -503,13 +503,18 @@ export function judgeAction(playerCards, dealerCard) {
 ```js
 // src/logic/betting/base.js
 class BettingMethod {
-  constructor(baseBet) { /* ... */ }
-  getNextBet() { /* 次のベット額を返す */ }
+  // baseBet は 1 ユニットの通貨額。options は各メソッド固有の初期化値（任意）
+  constructor(baseBet, options) { /* ... */ }
+  // context: { fund?: number }。資金依存メソッド（10% 法など）が参照、他は無視
+  getNextBet(context) { /* 次のベット額を返す */ }
   recordResult(result) { /* 結果を記録して内部状態更新 */ }
   reset() { /* 初期状態にリセット */ }
-  getState() { /* 現在の状態を返す（表示用） */ }
+  getState(context) { /* 現在の状態を返す（永続化＆表示用、restore() の入力にもなる） */ }
+  restore(state) { /* getState() 形式のオブジェクトから内部状態を復元 */ }
 }
 ```
+
+`registry.createMethod(id, baseBet, methodOptions)` は `methodOptions?.[id]` を常にコンストラクタ第 2 引数に渡す。options を必要としないメソッドは引数を無視するだけでよい。
 
 **セッション管理**
 ```js
@@ -646,9 +651,15 @@ bj-strategy-bet:custom-strategy  // カスタムストラテジー表
   ],
   "methodSwitches": [
     { "atHandId": 4, "from": "barnett", "to": "montecarlo", "timestamp": "..." }
+  ],
+  "fundAdjustments": [
+    { "atHandId": 3, "before": 10300, "after": 12000, "timestamp": "..." }
   ]
 }
 ```
+
+`fundAdjustments` は **手動の資金編集** を独立イベントとして記録する配列。`atHandId` は「N ハンド完了直後に編集された」ことを表し（`0` は最初のハンド前）、`before` / `after` は編集前後の資金。
+過去 `hands[].fundAfter` は「そのハンド時点の真の資金」として書き換えず、編集の差分は `fundAdjustments` に残すことで、ゲーム成績（勝敗から算出）と外部資金変動を切り分けられる。
 
 **history**
 ```json
@@ -661,26 +672,34 @@ bj-strategy-bet:custom-strategy  // カスタムストラテジー表
     "endFund": 12000,
     "totalHands": 50,
     "winRate": 0.48,
+    "gameplayProfit": 300,
+    "adjustmentTotal": 1700,
     "methodSummary": [
       {
         "method": "barnett",
         "hands": 30,
         "winRate": 0.50,
-        "profit": 1500
+        "profit": 100
       },
       {
         "method": "montecarlo",
         "hands": 20,
         "winRate": 0.45,
-        "profit": 500
+        "profit": 200
       }
     ],
     "methodSwitches": [
       { "atHandId": 31, "from": "barnett", "to": "montecarlo" }
-    ]
+    ],
+    "fundAdjustments": [
+      { "atHandId": 10, "before": 10500, "after": 12200, "timestamp": "..." }
+    ],
+    "snapshot": { "...": "復元用に current-session 全体を保持。fundAdjustments も含む" }
   }
 ]
 ```
+
+`gameplayProfit` は勝敗（ハンドの bet/result）から算出した純粋なゲーム成績。`adjustmentTotal` は手動編集の差分合計。`endFund - startFund == gameplayProfit + adjustmentTotal` の関係になる。`methodSummary[].profit` も bet/result ベースで算出されるため、外部資金変動はメソッド成績に混入しない。
 
 ---
 

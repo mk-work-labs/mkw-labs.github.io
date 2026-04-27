@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { RANKS } from '../../logic/cards.js';
+import { useFocusTrap } from '../../hooks/useFocusTrap.js';
 import './RankPicker.css';
 
 const SLOT_LABELS = {
@@ -8,7 +9,11 @@ const SLOT_LABELS = {
   dealer: 'ディーラー',
 };
 
+const TITLE_ID = 'rank-picker-title';
+
 export default function RankPicker({ slot, onPick, onClose }) {
+  const sheetRef = useFocusTrap(slot !== null);
+
   useEffect(() => {
     if (slot === null) return;
     const handleKeyDown = (event) => {
@@ -21,11 +26,11 @@ export default function RankPicker({ slot, onPick, onClose }) {
   if (slot === null) return null;
 
   return (
-    <div className="rank-picker" role="dialog" aria-modal="true" aria-label={SLOT_LABELS[slot]}>
+    <div className="rank-picker" role="dialog" aria-modal="true" aria-labelledby={TITLE_ID}>
       <div className="rank-picker__backdrop" onClick={onClose} />
-      <div className="rank-picker__sheet" role="document">
+      <div className="rank-picker__sheet" role="document" ref={sheetRef}>
         <div className="rank-picker__header">
-          <h2 className="rank-picker__title">{SLOT_LABELS[slot]}</h2>
+          <h2 className="rank-picker__title" id={TITLE_ID}>{SLOT_LABELS[slot]}</h2>
           <button
             type="button"
             className="rank-picker__close"

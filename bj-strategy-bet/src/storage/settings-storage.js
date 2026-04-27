@@ -32,9 +32,15 @@ export function normalizeMontecarloSequence(raw, fallback = DEFAULT_MONTECARLO_S
 }
 
 export function normalizeMontecarloCycleEndRule(raw) {
-  return MONTECARLO_CYCLE_END_RULES.includes(raw)
-    ? raw
-    : DEFAULT_MONTECARLO_CYCLE_END_RULE;
+  if (MONTECARLO_CYCLE_END_RULES.includes(raw)) return raw;
+  // raw が undefined（未設定）なら通常運用なので静かに既定値で埋める。
+  // 値が入っているのに不正な場合のみ警告を出して不可視のスキーマ齟齬を可視化する
+  if (raw !== undefined && raw !== null) {
+    console.warn(
+      `[settings] unknown montecarlo cycleEndRule "${raw}" — falling back to "${DEFAULT_MONTECARLO_CYCLE_END_RULE}"`
+    );
+  }
+  return DEFAULT_MONTECARLO_CYCLE_END_RULE;
 }
 
 function buildDefaults() {
