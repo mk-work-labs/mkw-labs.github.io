@@ -503,13 +503,18 @@ export function judgeAction(playerCards, dealerCard) {
 ```js
 // src/logic/betting/base.js
 class BettingMethod {
-  constructor(baseBet) { /* ... */ }
-  getNextBet() { /* 次のベット額を返す */ }
+  // baseBet は 1 ユニットの通貨額。options は各メソッド固有の初期化値（任意）
+  constructor(baseBet, options) { /* ... */ }
+  // context: { fund?: number }。資金依存メソッド（10% 法など）が参照、他は無視
+  getNextBet(context) { /* 次のベット額を返す */ }
   recordResult(result) { /* 結果を記録して内部状態更新 */ }
   reset() { /* 初期状態にリセット */ }
-  getState() { /* 現在の状態を返す（表示用） */ }
+  getState(context) { /* 現在の状態を返す（永続化＆表示用、restore() の入力にもなる） */ }
+  restore(state) { /* getState() 形式のオブジェクトから内部状態を復元 */ }
 }
 ```
+
+`registry.createMethod(id, baseBet, methodOptions)` は `methodOptions?.[id]` を常にコンストラクタ第 2 引数に渡す。options を必要としないメソッドは引数を無視するだけでよい。
 
 **セッション管理**
 ```js

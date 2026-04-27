@@ -66,14 +66,12 @@ function findEntry(methodId) {
 }
 
 // 未実装 ID や不正値は DEFAULT_METHOD_ID にフォールバック。
-// methodOptions は { [methodId]: { ... } } の形。モンテカルロ法の initialSequence 等を渡す
+// methodOptions は { [methodId]: { ... } } の形。各メソッドのコンストラクタに
+// 自分の id 用 options が常に渡される。options を必要としないメソッドは無視するだけ
 export function createMethod(methodId, baseBet, methodOptions = {}) {
   const entry = findEntry(methodId);
   const resolved = !entry || !entry.implemented ? findEntry(DEFAULT_METHOD_ID) : entry;
-  if (resolved.id === 'montecarlo') {
-    return new resolved.ctor(baseBet, methodOptions?.montecarlo);
-  }
-  return new resolved.ctor(baseBet);
+  return new resolved.ctor(baseBet, methodOptions?.[resolved.id]);
 }
 
 export function resolveMethodId(methodId) {
