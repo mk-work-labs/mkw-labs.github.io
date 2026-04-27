@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   METHODS,
   getMethodLabel,
@@ -20,10 +20,10 @@ function parsePositiveInt(value, fallback) {
   return n;
 }
 
-// ドラフト配列（空文字含む）を数値配列へ。空・非数値は落とす
+// ドラフト配列（{id, value} を持つ）から値だけ取り出して数値配列へ。空・非数値は落とす
 function parseSequenceDraft(draft) {
   return draft
-    .map((t) => String(t).trim())
+    .map((t) => String(t.value).trim())
     .filter((t) => t.length > 0)
     .map((t) => Number(t));
 }
@@ -53,10 +53,13 @@ function computeTailStreak(hands) {
 // onEditStrategy があればストラテジー表編集への導線ボタンを表示する（オーバーレイ用）
 export default function SettingsForm({ onSaved, onEditStrategy }) {
   const [form, setForm] = useState(() => loadSettings());
-  // モンテカルロ数列は要素ごとにフィールド化する。編集中の空文字を保持するため文字列配列
+  // 数列要素ごとに安定 ID を持たせる。中間削除時に他の input のフォーカス・値が
+  // 隣接エントリへ「ずれ込む」のを防ぐ
+  const seqIdCounterRef = useRef(0);
+  const makeSeqId = () => `mc-seq-${++seqIdCounterRef.current}`;
   const [mcSequenceDraft, setMcSequenceDraft] = useState(() => {
     const initial = loadSettings().methodOptions?.montecarlo?.sequence ?? [1, 2, 3];
-    return initial.map(String);
+    return initial.map((v) => ({ id: makeSeqId(), value: String(v) }));
   });
   const [savedAt, setSavedAt] = useState(null);
 
@@ -83,23 +86,25 @@ export default function SettingsForm({ onSaved, onEditStrategy }) {
     setSavedAt(null);
   };
 
-  const updateMcElement = (index, value) => {
+  const updateMcElement = (id, value) => {
     // number input は負号や小数点を含む文字列を渡してくる可能性があるので
     // 入力中は緩く受け、保存時に normalize する
-    setMcSequenceDraft((prev) => prev.map((v, i) => (i === index ? value : v)));
+    setMcSequenceDraft((prev) =>
+      prev.map((entry) => (entry.id === id ? { ...entry, value } : entry))
+    );
     setSavedAt(null);
   };
 
-  const removeMcElement = (index) => {
+  const removeMcElement = (id) => {
     setMcSequenceDraft((prev) => {
       if (prev.length <= 2) return prev; // 最小 2 要素は保持
-      return prev.filter((_, i) => i !== index);
+      return prev.filter((entry) => entry.id !== id);
     });
     setSavedAt(null);
   };
 
   const addMcElement = () => {
-    setMcSequenceDraft((prev) => [...prev, '']);
+    setMcSequenceDraft((prev) => [...prev, { id: makeSeqId(), value: '' }]);
     setSavedAt(null);
   };
 
@@ -150,8 +155,8 @@ export default function SettingsForm({ onSaved, onEditStrategy }) {
     }
 
     setForm(normalized);
-    // 正規化結果を入力欄にも反映（不正入力は既定値に戻る）
-    setMcSequenceDraft(normalizedSequence.map(String));
+    // 正規化結果を入力欄にも反映（不正入力は既定値に戻る）。ID は再採番して既存 input を入れ替える
+    setMcSequenceDraft(normalizedSequence.map((v) => ({ id: makeSeqId(), value: String(v) })));
     saveSettings(normalized);
     setSavedAt(new Date());
     onSaved?.(normalized);
@@ -170,7 +175,7 @@ export default function SettingsForm({ onSaved, onEditStrategy }) {
         },
       },
     });
-    setMcSequenceDraft(defaultSequence.map(String));
+    setMcSequenceDraft(defaultSequence.map((v) => ({ id: makeSeqId(), value: String(v) })));
     setSavedAt(null);
   };
 
@@ -240,22 +245,22 @@ export default function SettingsForm({ onSaved, onEditStrategy }) {
         <div className="settings-form__field">
           <span className="settings-form__label">モンテカルロ数列（初期値）</span>
           <div className="settings-form__seq" role="group" aria-label="モンテカルロ数列">
-            {mcSequenceDraft.map((val, i) => (
-              <div className="settings-form__seq-item" key={i}>
+            {mcSequenceDraft.map((entry, i) => (
+              <div className="settings-form__seq-item" key={entry.id}>
                 <span className="settings-form__seq-index">#{i + 1}</span>
                 <input
                   type="number"
                   inputMode="numeric"
                   min="1"
                   className="settings-form__seq-input"
-                  value={val}
-                  onChange={(e) => updateMcElement(i, e.target.value)}
+                  value={entry.value}
+                  onChange={(e) => updateMcElement(entry.id, e.target.value)}
                   aria-label={`${i + 1} 番目の値`}
                 />
                 <button
                   type="button"
                   className="settings-form__seq-remove"
-                  onClick={() => removeMcElement(i)}
+                  onClick={() => removeMcElement(entry.id)}
                   disabled={mcSequenceDraft.length <= 2}
                   aria-label={`${i + 1} 番目を削除`}
                   title={
