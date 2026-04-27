@@ -1,12 +1,15 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   loadHistory,
   restoreFromHistory,
   saveHistory,
 } from '../../storage/history-storage.js';
 import { loadSession } from '../../storage/session-storage.js';
+import { subscribeStorage } from '../../storage/local-storage.js';
 import { getMethodLabel } from '../../logic/betting/registry.js';
 import './HistoryView.css';
+
+const HISTORY_KEY = 'bj-strategy-bet:history';
 
 function formatYen(n) {
   const sign = n < 0 ? '-' : '';
@@ -51,6 +54,21 @@ function formatDateRange(startedAt, endedAt) {
 export default function HistoryView({ onRestore }) {
   const [history, setHistory] = useState(() => loadHistory());
 
+  // 他タブからの履歴更新と bfcache 復元に追従して最新の履歴を表示する。
+  // 履歴一覧は編集対象を持たないため、確認なしで再読込してよい。
+  useEffect(() => {
+    const refresh = () => setHistory(loadHistory());
+    const unsub = subscribeStorage(HISTORY_KEY, refresh);
+    const handlePageShow = (e) => {
+      if (e.persisted) refresh();
+    };
+    window.addEventListener('pageshow', handlePageShow);
+    return () => {
+      unsub();
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, []);
+
   const sortedHistory = useMemo(
     () => [...history].sort((a, b) => (a.startedAt < b.startedAt ? 1 : -1)),
     [history]
@@ -78,7 +96,7 @@ export default function HistoryView({ onRestore }) {
     try {
       restoreFromHistory(entry);
     } catch (e) {
-      console.warn('restoreFromHistory failed', e);
+      console.error('restoreFromHistory failed', e);
       window.alert('復元に失敗しました。');
       return;
     }
@@ -110,7 +128,13 @@ export default function HistoryView({ onRestore }) {
       </div>
       <ul className="history-view__list">
         {sortedHistory.map((entry) => {
-          const profit = entry.endFund - entry.startFund;
+          // gameplayProfit は手動資金編集を除いたゲーム純成績。古い履歴は未保存のため endFund-startFund に fallback
+          const profit =
+            typeof entry.gameplayProfit === 'number'
+              ? entry.gameplayProfit
+              : entry.endFund - entry.startFund;
+          const adjustmentTotal =
+            typeof entry.adjustmentTotal === 'number' ? entry.adjustmentTotal : 0;
           const profitClass =
             profit > 0
               ? 'history-card__profit--positive'
@@ -142,6 +166,12 @@ export default function HistoryView({ onRestore }) {
                   <dt>勝率</dt>
                   <dd>{formatPercent(entry.winRate)}</dd>
                 </div>
+                {adjustmentTotal !== 0 && (
+                  <div className="history-card__stat">
+                    <dt>資金編集</dt>
+                    <dd>{formatSignedYen(adjustmentTotal)}</dd>
+                  </div>
+                )}
               </dl>
               {entry.methodSummary?.length > 0 && (
                 <ul className="history-card__methods">

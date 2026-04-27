@@ -1,8 +1,13 @@
 import { useEffect } from 'react';
 import HistoryView from './HistoryView.jsx';
+import { useFocusTrap } from '../../hooks/useFocusTrap.js';
 import './HistoryOverlay.css';
 
+const TITLE_ID = 'history-overlay-title';
+
 export default function HistoryOverlay({ open, onClose, onRestored }) {
+  const sheetRef = useFocusTrap(open);
+
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (event) => {
@@ -20,11 +25,11 @@ export default function HistoryOverlay({ open, onClose, onRestored }) {
   };
 
   return (
-    <div className="history-overlay" role="dialog" aria-modal="true" aria-label="履歴">
+    <div className="history-overlay" role="dialog" aria-modal="true" aria-labelledby={TITLE_ID}>
       <div className="history-overlay__backdrop" onClick={onClose} />
-      <div className="history-overlay__sheet" role="document">
+      <div className="history-overlay__sheet" role="document" ref={sheetRef}>
         <header className="history-overlay__header">
-          <h2 className="history-overlay__title">履歴</h2>
+          <h2 className="history-overlay__title" id={TITLE_ID}>履歴</h2>
           <button
             type="button"
             className="history-overlay__close"

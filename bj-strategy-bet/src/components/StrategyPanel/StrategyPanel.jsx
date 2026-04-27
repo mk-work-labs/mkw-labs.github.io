@@ -121,10 +121,6 @@ export default function StrategyPanel() {
             <span className="strategy-panel__result-placeholder">—</span>
           )}
         </div>
-        <div className="strategy-panel__result-row">
-          <span className="strategy-panel__result-label">勝率</span>
-          <span className="strategy-panel__result-placeholder">—</span>
-        </div>
       </div>
       <RankPicker
         slot={pickerSlot}

@@ -2,6 +2,7 @@ import { readJSON, writeJSON } from './local-storage.js';
 import { loadSession, saveSession } from './session-storage.js';
 import { saveSettings } from './settings-storage.js';
 import { resolveMethodId } from '../logic/betting/registry.js';
+import { handFundDelta } from '../logic/betting/base.js';
 
 const KEY = 'bj-strategy-bet:history';
 
@@ -18,10 +19,11 @@ export function saveHistory(list) {
 }
 
 // current-session を history エントリに集計して変換する。
-// per-method の profit は hand 間の fundAfter 差分で算出（手動の資金編集も含めて実績ベース）
-// snapshot には復元用に raw な session 状態を丸ごと含める
+// per-method の profit は bet/result から算出した純粋なゲーム成績（手動資金編集の差分は除外）。
+// gameplayProfit はセッション全体のゲーム成績、adjustmentTotal は手動編集の合計。
+// snapshot には復元用に raw な session 状態（fundAdjustments 含む）を丸ごと含める。
 export function buildHistoryEntry(session) {
-  const { startedAt, initialFund, baseBet, currentFund, currentMethod, methodState, hands, methodSwitches } = session;
+  const { startedAt, initialFund, baseBet, currentFund, currentMethod, methodState, hands, methodSwitches, fundAdjustments } = session;
   const totalHands = hands.length;
   const endFund = totalHands > 0 ? hands[totalHands - 1].fundAfter : initialFund;
 
@@ -30,10 +32,10 @@ export function buildHistoryEntry(session) {
   const winRate = decided.length === 0 ? 0 : wins / decided.length;
 
   const methodAcc = new Map();
-  let prevFund = initialFund;
+  let gameplayProfit = 0;
   for (const h of hands) {
-    const delta = h.fundAfter - prevFund;
-    prevFund = h.fundAfter;
+    const delta = handFundDelta(h.result, h.bet);
+    gameplayProfit += delta;
     let entry = methodAcc.get(h.bettingMethod);
     if (!entry) {
       entry = { method: h.bettingMethod, hands: 0, decided: 0, wins: 0, profit: 0 };
@@ -46,6 +48,12 @@ export function buildHistoryEntry(session) {
       if (h.result === 'win' || h.result === 'bj') entry.wins += 1;
     }
   }
+
+  const adjustments = Array.isArray(fundAdjustments) ? fundAdjustments : [];
+  const adjustmentTotal = adjustments.reduce(
+    (acc, a) => acc + (Number(a?.after) - Number(a?.before) || 0),
+    0
+  );
 
   const methodSummary = Array.from(methodAcc.values()).map((e) => ({
     method: e.method,
@@ -62,8 +70,11 @@ export function buildHistoryEntry(session) {
     endFund,
     totalHands,
     winRate,
+    gameplayProfit,
+    adjustmentTotal,
     methodSummary,
     methodSwitches: methodSwitches ?? [],
+    fundAdjustments: adjustments,
     snapshot: {
       startedAt,
       initialFund,
@@ -73,6 +84,7 @@ export function buildHistoryEntry(session) {
       methodState: methodState ?? {},
       hands,
       methodSwitches: methodSwitches ?? [],
+      fundAdjustments: adjustments,
     },
   };
 }
@@ -117,6 +129,7 @@ export function restoreFromHistory(entry) {
     methodState: snapshot.methodState ?? {},
     hands: Array.isArray(snapshot.hands) ? snapshot.hands : [],
     methodSwitches: snapshot.methodSwitches ?? [],
+    fundAdjustments: Array.isArray(snapshot.fundAdjustments) ? snapshot.fundAdjustments : [],
   });
 
   saveHistory(loadHistory().filter((e) => e.id !== entry.id));
