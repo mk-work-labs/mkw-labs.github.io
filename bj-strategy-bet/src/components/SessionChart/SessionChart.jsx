@@ -14,12 +14,22 @@ function formatAxisValue(n) {
   return Math.round(n).toLocaleString('ja-JP');
 }
 
+function formatYenSigned(n) {
+  const v = Math.round(n);
+  const sign = v > 0 ? '+' : v < 0 ? '-' : '';
+  return `${sign}¥${Math.abs(v).toLocaleString('ja-JP')}`;
+}
+
 // hands と initialFund から SVG 描画に必要な座標群を算出。
 // 最左端を initialFund とし、以降は hands[].fundAfter を等間隔に並べる。
-function buildChart(hands, initialFund, methodSwitches) {
+function buildChart(hands, initialFund, methodSwitches, fundAdjustments) {
   const funds = [initialFund, ...hands.map((h) => h.fundAfter)];
-  const dataMin = Math.min(...funds);
-  const dataMax = Math.max(...funds);
+  // 資金編集の after 値も Y 軸範囲に含める（最後のハンド以降に編集された場合などで funds 外になり得る）
+  const adjAfters = (fundAdjustments ?? [])
+    .map((a) => Number(a?.after))
+    .filter((v) => Number.isFinite(v));
+  const dataMin = Math.min(...funds, ...adjAfters);
+  const dataMax = Math.max(...funds, ...adjAfters);
   let range = dataMax - dataMin;
   if (range === 0) {
     // 平坦線の時に潰れないよう、initialFund の 10% をフォールバックに敷く
@@ -60,6 +70,31 @@ function buildChart(hands, initialFund, methodSwitches) {
     })
     .filter(Boolean);
 
+  // 資金編集マーカー: atHandId=N は N ハンド完了直後の境界。
+  // 切替えと同じ位置規則で、最後尾なら funds[N] 位置、中間なら funds[N] と funds[N+1] の中点
+  const adjustments = (fundAdjustments ?? [])
+    .map((adj) => {
+      const idx = Number(adj.atHandId);
+      if (!Number.isFinite(idx) || idx < 0 || idx >= funds.length) return null;
+      const before = Number(adj.before);
+      const after = Number(adj.after);
+      if (!Number.isFinite(before) || !Number.isFinite(after)) return null;
+      const x =
+        idx === funds.length - 1
+          ? xOf(idx)
+          : (xOf(idx) + xOf(idx + 1)) / 2;
+      return {
+        x,
+        yBefore: yOf(before),
+        yAfter: yOf(after),
+        before,
+        after,
+        delta: after - before,
+        timestamp: adj.timestamp,
+      };
+    })
+    .filter(Boolean);
+
   return {
     path,
     lastPoint,
@@ -73,13 +108,19 @@ function buildChart(hands, initialFund, methodSwitches) {
     xFirst: xOf(1),
     xLast: xOf(funds.length - 1),
     switches,
+    adjustments,
   };
 }
 
-export default function SessionChart({ hands, initialFund, methodSwitches }) {
+export default function SessionChart({
+  hands,
+  initialFund,
+  methodSwitches,
+  fundAdjustments,
+}) {
   const chart = useMemo(
-    () => buildChart(hands, initialFund, methodSwitches),
-    [hands, initialFund, methodSwitches]
+    () => buildChart(hands, initialFund, methodSwitches, fundAdjustments),
+    [hands, initialFund, methodSwitches, fundAdjustments]
   );
 
   const isEmpty = hands.length === 0;
@@ -141,6 +182,34 @@ export default function SessionChart({ hands, initialFund, methodSwitches }) {
               {`ハンド${sw.atHandId} 切替え: ${sw.from ?? '?'} → ${sw.to ?? '?'}`}
             </title>
           </line>
+        ))}
+
+        {/* 資金編集の地点。垂直バーで before→after を可視化し、after 位置に菱形マーカー */}
+        {chart.adjustments.map((adj, i) => (
+          <g key={`adj-${i}-${adj.timestamp ?? i}`}>
+            <line
+              x1={adj.x}
+              y1={adj.yBefore}
+              x2={adj.x}
+              y2={adj.yAfter}
+              stroke="#8b5cf6"
+              strokeWidth="1.25"
+            >
+              <title>
+                {`資金編集: ${formatAxisValue(adj.before)} → ${formatAxisValue(adj.after)}（${formatYenSigned(adj.delta)}）`}
+              </title>
+            </line>
+            <circle
+              cx={adj.x}
+              cy={adj.yAfter}
+              r="2.5"
+              fill="#8b5cf6"
+            >
+              <title>
+                {`資金編集: ${formatAxisValue(adj.before)} → ${formatAxisValue(adj.after)}（${formatYenSigned(adj.delta)}）`}
+              </title>
+            </circle>
+          </g>
         ))}
 
         {/* 折れ線 */}

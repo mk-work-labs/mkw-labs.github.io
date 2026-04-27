@@ -110,7 +110,13 @@ export default function HistoryView({ onRestore }) {
       </div>
       <ul className="history-view__list">
         {sortedHistory.map((entry) => {
-          const profit = entry.endFund - entry.startFund;
+          // gameplayProfit は手動資金編集を除いたゲーム純成績。古い履歴は未保存のため endFund-startFund に fallback
+          const profit =
+            typeof entry.gameplayProfit === 'number'
+              ? entry.gameplayProfit
+              : entry.endFund - entry.startFund;
+          const adjustmentTotal =
+            typeof entry.adjustmentTotal === 'number' ? entry.adjustmentTotal : 0;
           const profitClass =
             profit > 0
               ? 'history-card__profit--positive'
@@ -142,6 +148,12 @@ export default function HistoryView({ onRestore }) {
                   <dt>勝率</dt>
                   <dd>{formatPercent(entry.winRate)}</dd>
                 </div>
+                {adjustmentTotal !== 0 && (
+                  <div className="history-card__stat">
+                    <dt>資金編集</dt>
+                    <dd>{formatSignedYen(adjustmentTotal)}</dd>
+                  </div>
+                )}
               </dl>
               {entry.methodSummary?.length > 0 && (
                 <ul className="history-card__methods">

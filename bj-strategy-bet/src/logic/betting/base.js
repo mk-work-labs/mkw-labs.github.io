@@ -41,3 +41,12 @@ export function assertValidResult(result) {
     );
   }
 }
+
+// 仕様書 §3 基準ルール: BJ 配当 1.5 倍、その他は 1:1。
+// ハンド結果から純粋な資金変動量を算出する（手動の資金編集など外部要因は含まない）
+export function handFundDelta(result, bet) {
+  if (result === 'win') return bet;
+  if (result === 'bj') return Math.round(bet * 1.5);
+  if (result === 'loss') return -bet;
+  return 0;
+}

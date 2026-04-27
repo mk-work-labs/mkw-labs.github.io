@@ -4,6 +4,7 @@ import {
   getMethodLabel,
   resolveMethodId,
 } from '../../logic/betting/registry.js';
+import { handFundDelta } from '../../logic/betting/base.js';
 import { loadSettings } from '../../storage/settings-storage.js';
 import {
   loadSession,
@@ -17,13 +18,6 @@ function formatYen(n) {
   return `${sign}¥${Math.abs(n).toLocaleString('ja-JP')}`;
 }
 
-function fundDelta(result, bet) {
-  if (result === 'win') return bet;
-  if (result === 'bj') return Math.round(bet * 1.5);
-  if (result === 'loss') return -bet;
-  return 0;
-}
-
 function buildInitialSession(settings, methodId) {
   return {
     startedAt: new Date().toISOString(),
@@ -34,6 +28,7 @@ function buildInitialSession(settings, methodId) {
     methodState: {},
     hands: [],
     methodSwitches: [],
+    fundAdjustments: [],
   };
 }
 
@@ -114,6 +109,9 @@ export default function BettingPanel({ onSessionChange } = {}) {
   const [methodSwitches, setMethodSwitches] = useState(
     initialSession.methodSwitches ?? []
   );
+  const [fundAdjustments, setFundAdjustments] = useState(
+    initialSession.fundAdjustments ?? []
+  );
   const [methodState, setMethodState] = useState(() =>
     method.getState({ fund: initialSession.currentFund })
   );
@@ -141,9 +139,10 @@ export default function BettingPanel({ onSessionChange } = {}) {
       },
       hands,
       methodSwitches,
+      fundAdjustments,
     });
-    onSessionChange?.({ hands, methodSwitches });
-  }, [startedAt, settings, activeMethodId, fund, hands, methodState, methodSwitches, initialSession, onSessionChange]);
+    onSessionChange?.({ hands, methodSwitches, fundAdjustments });
+  }, [startedAt, settings, activeMethodId, fund, hands, methodState, methodSwitches, fundAdjustments, initialSession, onSessionChange]);
 
   const stats = useMemo(() => {
     const decided = hands.filter((h) => h.result !== 'push');
@@ -162,7 +161,7 @@ export default function BettingPanel({ onSessionChange } = {}) {
 
   const handleResult = (result) => {
     const bet = method.getNextBet({ fund });
-    const delta = fundDelta(result, bet);
+    const delta = handFundDelta(result, bet);
     const nextFund = fund + delta;
 
     method.recordResult(result);
@@ -195,6 +194,7 @@ export default function BettingPanel({ onSessionChange } = {}) {
         currentMethod: activeMethodId,
         hands,
         methodSwitches,
+        fundAdjustments,
       });
     }
     method.reset();
@@ -202,6 +202,7 @@ export default function BettingPanel({ onSessionChange } = {}) {
     setFund(settings.initialFund);
     setHands([]);
     setMethodSwitches([]);
+    setFundAdjustments([]);
     setStartedAt(new Date().toISOString());
   };
 
@@ -224,9 +225,22 @@ export default function BettingPanel({ onSessionChange } = {}) {
       return;
     }
     const newFund = Math.trunc(n);
-    setFund(newFund);
-    // 10% 法などは fund 依存で次回ベットが決まるため、編集時も再計算する
-    setMethodState(method.getState({ fund: newFund }));
+    if (newFund !== fund) {
+      // 過去 hands[].fundAfter の意味論を保つため、編集差分は別レコードに残す。
+      // SessionChart や履歴集計はこれを参照して、外部資金変動とゲーム成績を切り分ける
+      setFundAdjustments((prev) => [
+        ...prev,
+        {
+          atHandId: hands.length,
+          before: fund,
+          after: newFund,
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+      setFund(newFund);
+      // 10% 法などは fund 依存で次回ベットが決まるため、編集時も再計算する
+      setMethodState(method.getState({ fund: newFund }));
+    }
     cancelEditFund();
   };
 

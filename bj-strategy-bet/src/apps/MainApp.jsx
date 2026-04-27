@@ -19,11 +19,14 @@ export default function MainApp() {
   // カード選択状態を保持するため key による再マウントは避ける
   const [, setStrategyRevision] = useState(0);
 
-  // SessionChart 用に hands / methodSwitches と settings（initialFund）を保持。
+  // SessionChart 用に hands / methodSwitches / fundAdjustments と settings（initialFund）を保持。
   // BettingPanel から callback で同期、settings は保存直後に再読込する。
   const [hands, setHands] = useState(() => loadSession()?.hands ?? []);
   const [methodSwitches, setMethodSwitches] = useState(
     () => loadSession()?.methodSwitches ?? []
+  );
+  const [fundAdjustments, setFundAdjustments] = useState(
+    () => loadSession()?.fundAdjustments ?? []
   );
   const settings = useMemo(() => loadSettings(), [bettingVersion]);
 
@@ -35,10 +38,14 @@ export default function MainApp() {
     setStrategyRevision((v) => v + 1);
   };
 
-  const handleSessionChange = useCallback(({ hands, methodSwitches }) => {
-    setHands(hands);
-    setMethodSwitches(methodSwitches ?? []);
-  }, []);
+  const handleSessionChange = useCallback(
+    ({ hands, methodSwitches, fundAdjustments }) => {
+      setHands(hands);
+      setMethodSwitches(methodSwitches ?? []);
+      setFundAdjustments(fundAdjustments ?? []);
+    },
+    []
+  );
 
   const handleHistoryRestored = useCallback(() => {
     // 復元後に current-session と settings を読み直すため bettingVersion を bump。
@@ -46,6 +53,7 @@ export default function MainApp() {
     const restored = loadSession();
     setHands(restored?.hands ?? []);
     setMethodSwitches(restored?.methodSwitches ?? []);
+    setFundAdjustments(restored?.fundAdjustments ?? []);
     setBettingVersion((v) => v + 1);
   }, []);
 
@@ -60,6 +68,7 @@ export default function MainApp() {
         hands={hands}
         initialFund={settings.initialFund}
         methodSwitches={methodSwitches}
+        fundAdjustments={fundAdjustments}
       />
       <nav className="main-app__nav">
         <button
