@@ -1,12 +1,15 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   loadHistory,
   restoreFromHistory,
   saveHistory,
 } from '../../storage/history-storage.js';
 import { loadSession } from '../../storage/session-storage.js';
+import { subscribeStorage } from '../../storage/local-storage.js';
 import { getMethodLabel } from '../../logic/betting/registry.js';
 import './HistoryView.css';
+
+const HISTORY_KEY = 'bj-strategy-bet:history';
 
 function formatYen(n) {
   const sign = n < 0 ? '-' : '';
@@ -50,6 +53,21 @@ function formatDateRange(startedAt, endedAt) {
 
 export default function HistoryView({ onRestore }) {
   const [history, setHistory] = useState(() => loadHistory());
+
+  // 他タブからの履歴更新と bfcache 復元に追従して最新の履歴を表示する。
+  // 履歴一覧は編集対象を持たないため、確認なしで再読込してよい。
+  useEffect(() => {
+    const refresh = () => setHistory(loadHistory());
+    const unsub = subscribeStorage(HISTORY_KEY, refresh);
+    const handlePageShow = (e) => {
+      if (e.persisted) refresh();
+    };
+    window.addEventListener('pageshow', handlePageShow);
+    return () => {
+      unsub();
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, []);
 
   const sortedHistory = useMemo(
     () => [...history].sort((a, b) => (a.startedAt < b.startedAt ? 1 : -1)),

@@ -15,6 +15,48 @@ export function subscribeStorageError(listener) {
   };
 }
 
+// 他タブからの localStorage 変更を購読する。
+// 'storage' イベントは書き込み元タブには発火しないため、自タブの書き込みでループする心配はない。
+const storageListeners = new Map(); // key -> Set<listener>
+let storageHandlerInstalled = false;
+
+function ensureStorageHandler() {
+  if (storageHandlerInstalled || typeof window === 'undefined') return;
+  storageHandlerInstalled = true;
+  window.addEventListener('storage', (e) => {
+    if (!e.key) return; // localStorage.clear() で全消去された場合
+    const set = storageListeners.get(e.key);
+    if (!set) return;
+    for (const listener of set) {
+      try {
+        listener({
+          key: e.key,
+          oldValue: e.oldValue,
+          newValue: e.newValue,
+        });
+      } catch {
+        // listener 例外で他に波及させない
+      }
+    }
+  });
+}
+
+export function subscribeStorage(key, listener) {
+  ensureStorageHandler();
+  let set = storageListeners.get(key);
+  if (!set) {
+    set = new Set();
+    storageListeners.set(key, set);
+  }
+  set.add(listener);
+  return () => {
+    const s = storageListeners.get(key);
+    if (!s) return;
+    s.delete(listener);
+    if (s.size === 0) storageListeners.delete(key);
+  };
+}
+
 function emitError(event) {
   for (const listener of errorListeners) {
     try {

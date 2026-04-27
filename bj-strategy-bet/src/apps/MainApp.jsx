@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import StrategyPanel from '../components/StrategyPanel/StrategyPanel.jsx';
 import BettingPanel from '../components/BettingPanel/BettingPanel.jsx';
 import SessionChart from '../components/SessionChart/SessionChart.jsx';
@@ -6,7 +6,11 @@ import SettingsOverlay from '../components/Settings/SettingsOverlay.jsx';
 import HistoryOverlay from '../components/History/HistoryOverlay.jsx';
 import { loadSession } from '../storage/session-storage.js';
 import { loadSettings } from '../storage/settings-storage.js';
+import { subscribeStorage } from '../storage/local-storage.js';
 import './MainApp.css';
+
+const SETTINGS_KEY = 'bj-strategy-bet:settings';
+const SESSION_KEY = 'bj-strategy-bet:current-session';
 
 export default function MainApp() {
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -56,6 +60,37 @@ export default function MainApp() {
     setFundAdjustments(restored?.fundAdjustments ?? []);
     setBettingVersion((v) => v + 1);
   }, []);
+
+  const reloadFromSession = useCallback(() => {
+    const restored = loadSession();
+    setHands(restored?.hands ?? []);
+    setMethodSwitches(restored?.methodSwitches ?? []);
+    setFundAdjustments(restored?.fundAdjustments ?? []);
+    setBettingVersion((v) => v + 1);
+  }, []);
+
+  // 他タブの変更（storage イベント）と bfcache 復元（pageshow persisted=true）に追従する。
+  // 同じタブ内の保存ではイベントが発火しないため、自タブの操作とは干渉しない。
+  useEffect(() => {
+    const unsubSettings = subscribeStorage(SETTINGS_KEY, () => {
+      setBettingVersion((v) => v + 1);
+    });
+    const unsubSession = subscribeStorage(SESSION_KEY, () => {
+      const ok = window.confirm(
+        '他のタブで現在のセッションが変更されました。\nこのタブを再読み込みしますか？\n（再読み込みしないと未保存の操作で他タブの変更が上書きされる可能性があります）'
+      );
+      if (ok) reloadFromSession();
+    });
+    const handlePageShow = (e) => {
+      if (e.persisted) reloadFromSession();
+    };
+    window.addEventListener('pageshow', handlePageShow);
+    return () => {
+      unsubSettings();
+      unsubSession();
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, [reloadFromSession]);
 
   return (
     <main className="main-app">
