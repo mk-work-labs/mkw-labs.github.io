@@ -61,6 +61,9 @@
 html,
 body {
   min-height: 100vh;
+  /* dvh はモバイル Safari のアドレスバー伸縮で 100vh が外れる問題を回避する。
+     対応していない環境では上の 100vh にフォールバック */
+  min-height: 100dvh;
 }
 
 body {

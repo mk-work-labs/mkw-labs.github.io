@@ -76,7 +76,15 @@ export function createMethod(methodId, baseBet, methodOptions = {}) {
 
 export function resolveMethodId(methodId) {
   const entry = findEntry(methodId);
-  return entry && entry.implemented ? entry.id : DEFAULT_METHOD_ID;
+  if (entry && entry.implemented) return entry.id;
+  // 未指定（未設定）は静かに既定へ。値が入っているのに解決できない場合は
+  // スキーマ齟齬の可能性があるので警告を残す
+  if (methodId !== undefined && methodId !== null && methodId !== '') {
+    console.warn(
+      `[registry] unknown betting method "${methodId}" — falling back to "${DEFAULT_METHOD_ID}"`
+    );
+  }
+  return DEFAULT_METHOD_ID;
 }
 
 export function getMethodLabel(methodId) {

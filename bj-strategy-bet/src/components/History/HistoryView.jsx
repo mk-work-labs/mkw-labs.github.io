@@ -96,7 +96,7 @@ export default function HistoryView({ onRestore }) {
     try {
       restoreFromHistory(entry);
     } catch (e) {
-      console.warn('restoreFromHistory failed', e);
+      console.error('restoreFromHistory failed', e);
       window.alert('復元に失敗しました。');
       return;
     }
